@@ -9,3 +9,7 @@ I learned what Binary Space Partitioning is and what are its typical use cases, 
 I found it very difficult to find a good combination of algorithms for dungeon generation that would both be efficient enough and not rely on trying things randomly until failing too many times. I also found out that I've gotten a bit rusty with algorithms and time complexity since it has been two years since I did the Data Structures & Algorithms -course and I haven't done too much similar coding since. If there are any good suggestions for algorithms that maybe have been implemented previously furing this course, I'm all ears (assuming my chosen combination of BSP + A\* is not sufficient for this course).
 
 Next up is thinking of a way for visualizing the eventual steps of the algorithms, adding tooling to the project (testing tools, test coverage, code style / linting) and starting the implementation of BSP.
+
+## Time used
+
+I used approximately 6 hours this week.
