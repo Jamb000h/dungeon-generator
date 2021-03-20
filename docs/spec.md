@@ -6,7 +6,7 @@ Programme: Bachelor of Computer Science
 
 Project language: English
 
-Programming language: JavaScript
+Programming language: TypeScript
 
 ## General Description
 

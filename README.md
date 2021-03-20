@@ -1,5 +1,7 @@
 # Dungeon generator
 
+Project for TiRaLabra
+
 The project tries to produce an efficient dungeon generation algorithm that generates dungeons that:
 
 - contain multiple rooms
@@ -7,6 +9,12 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 - contain routes between rooms
 - may contain rooms that connect to each other
 - ensures that all rooms are accessible without too long detours
+
+## Commands
+
+Install with `npm i`.
+Run tests with `npm t`.
+Generate test coverage with `npm run coverage`.
 
 ## Documentation
 
