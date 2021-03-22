@@ -24,17 +24,15 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 
 Used for room generation as it ensures there is no overlap and it is fairly efficient. As per [4] it should have a time and space complexity of `O(n log n)`
 
+BSP was chosen for room generation as it provides an efficient way of splitting a map into separate areas that rooms can then be generated into.
+
 ### A\* [3]
 
-Used for route generation:
-
-- Routes are generated between rooms by using A\*
-
-BSP was chosen for room generation as it provides an efficient way of splitting a map into separate areas that rooms can then be generated into.
+Used for route generation between doors.
 
 A\* should be good enough for finding paths between doors and it is going to use the manhattan distance to the goal door as its heuristic. The problem here is that this may generate dungeons that may have several roads next to each other, which is something that has to be mitigated somehow.
 
-As manhattan distance as a heuristic has time complexity of O(1), and each cell in the map is evaluated at most 4 times as we only allow horizontal or vertical movement, the time complexity should be 4 _ map size (n _ m), which equals `O(4nm)` and space complexity should be at most `O(nm)`.
+As manhattan distance as a heuristic has time complexity of `O(1)`, and each cell in the map is evaluated at most 4 times as we only allow horizontal or vertical movement, the time complexity should be `4 * map size` (n \* m), which equals `O(4nm)` and space complexity should be at most `O(nm)`.
 
 ## Inputs
 
