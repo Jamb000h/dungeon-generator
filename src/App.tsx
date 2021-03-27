@@ -29,6 +29,7 @@ function App() {
     // When loading UI, if there's no BSP Tree
     // Generate one and store it in state
     generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

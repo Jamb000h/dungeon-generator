@@ -13,6 +13,7 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 ## Commands
 
 Install with `npm i`.
+Run visualization with `npm start`
 Run tests with `npm t`.
 Generate test coverage with `npm run coverage`.
 
