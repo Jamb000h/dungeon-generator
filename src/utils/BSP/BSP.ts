@@ -1,95 +1,153 @@
-interface LeafPosition {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+import BSPTree, { BSPNode, Position } from "./BSPTree";
+
+enum SplitDirection {
+  VERTICAL,
+  HORIZONTAL,
 }
 
-export class BSPNode {
-  private childNodes: BSPNode[] = [];
+interface Options {
+  minArea?: number; // This means rectangle area, so width * height
+}
 
-  position: LeafPosition;
+interface DefaultOptions {
+  minArea: number;
+}
 
-  /**
-   * Create a new node for a BSP tree
-   * @param x The x coordinate for top left corner of the node
-   * @param y The y coordinate for top left cornet of the node
-   * @param width The width of the node
-   * @param height The height of the node
-   * @throws if any of the parameters is negative
-   * @throws if width or height is 0
-   */
-  constructor(x: number, y: number, width: number, height: number) {
-    if (x < 0 || y < 0) {
-      throw new Error('x and y have to be at least 0');
+export interface Room extends Position {}
+
+const defaultOptions: DefaultOptions = {
+  minArea: 100,
+};
+
+/**
+ * Runs BSP on an area of given size
+ * @param width Width of the area to run BSP on
+ * @param height Height of the area to run BSP on
+ * @return {BSPTree} a BSP tree
+ */
+const BSP = (width: number, height: number, options: Options): BSPTree => {
+  const opts = { ...defaultOptions, ...options };
+  const tree = new BSPTree(width, height);
+
+  // Generate the BSP tree by splitting the root node until it cannot be split anymore
+  const root = tree.getRoot();
+  split(root, opts);
+  return tree;
+};
+
+/**
+ * Splits a node into two separate nodes and continues by trying to split both
+ * of the generated nodes recursively
+ * @param node a node to split
+ * @param options options to give to the algorithm.
+ */
+const split = (node: BSPNode, options: Options & DefaultOptions) => {
+  const { minArea } = options;
+  const { x, y, width, height } = node.position;
+
+  // If we cannot sufficiently split the node to accomodate the minArea
+  // and padding given in options, don't split this node
+  if (!node.isLeaf() || !canSplit(minArea, width, height)) {
+    return;
+  }
+
+  // The logic is that if width is greater or equal to height, we want to
+  // split vertically and otherwise horizontally to keep the areas uniform
+  const splitDirection =
+    width >= height ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
+
+  if (splitDirection === SplitDirection.VERTICAL) {
+    const minimumSplit = Math.ceil(minArea / height);
+    const split = getRandomBetween(minimumSplit, width);
+
+    node.addChildren([
+      new BSPNode(x, y, split, height),
+      new BSPNode(x + split, y, width - split, height),
+    ]);
+  } else {
+    const minimumSplit = Math.ceil(minArea / width);
+    const split = getRandomBetween(minimumSplit, height);
+
+    node.addChildren([
+      new BSPNode(x, y, width, split),
+      new BSPNode(x, y + split, width, height - split),
+    ]);
+  }
+
+  // Run split on the node's children
+  for (let i = 0; i < node.getChildNodes().length; i++) {
+    split(node.getChildNodes()[i], options);
+  }
+};
+
+const getRandomBetween = (min: number, max: number): number => {
+  return Math.floor(Math.random() * (max - min)) + min;
+};
+
+/**
+ * Checks if a node can be split
+ * @param minArea minimum area of a room
+ * @param width width of current node
+ * @param height height of current node
+ * @return {boolean} true if can be split, false otherwise
+ */
+const canSplit = (minArea: number, width: number, height: number) => {
+  return width * height >= minArea * 1.1;
+};
+
+const canFitARoom = (minArea: number, height: number, width: number) => {
+  return height * width >= minArea;
+};
+
+const isTooDisproportionate = (width: number, height: number) => {
+  return height > 4 * width || width > 4 * height;
+};
+
+/**
+ * Generates rooms given a list of nodes. The rooms have
+ * @param nodes a list of nodes to generate rooms from
+ * @param minArea minimum area of a
+ */
+export const generateRooms = (
+  nodes: BSPNode[],
+  minArea: number,
+  padding = 20
+) => {
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    const { x, y, width, height } = node.position;
+
+    const paddedWidth = width - padding * 2;
+    const paddedHeight = height - padding * 2;
+
+    // Early continue if node is too small or too disproportionate
+    if (
+      !canFitARoom(minArea, paddedWidth, paddedHeight) ||
+      isTooDisproportionate(paddedWidth, paddedHeight)
+    ) {
+      continue;
     }
 
-    if (width < 1 || height < 1) {
-      throw new Error('width and height have to be at least 1');
-    }
+    const roomWidth =
+      Math.floor(paddedWidth / 2) +
+      Math.floor(Math.random() * (paddedWidth / 2));
+    const roomHeight =
+      Math.floor(paddedHeight / 2) +
+      Math.floor(Math.random() * (paddedHeight / 2));
+    const roomX =
+      x + padding + Math.floor(Math.random() * ((paddedWidth - roomWidth) / 2));
+    const roomY =
+      y +
+      padding +
+      Math.floor(Math.random() * ((paddedHeight - roomHeight) / 2));
 
-    this.position = {
-      x,
-      y,
-      width,
-      height,
+    node.room = {
+      x: roomX,
+      y: roomY,
+      width: roomWidth,
+      height: roomHeight,
     };
   }
+};
 
-  /**
-   * Returns the information whether the node is a leaf in the BSP tree
-   * @return {boolean} True if node is leaf, false otherwise
-   */
-  isLeaf(): boolean {
-    return this.childNodes.length === 0;
-  }
-
-  /**
-   * Returns the children of this node
-   * @return {BSPNode[]} the list of child nodes
-   */
-  getChildNodes() {
-    return this.childNodes;
-  }
-
-  /**
-   * Adds a node as a child of the node
-   * @param node node to add as a child
-   * @throws will throw an error if there are already two children
-   */
-  addChild(node: BSPNode) {
-    if (this.childNodes.length < 2) {
-      this.childNodes.push(node);
-
-      return;
-    }
-
-    throw new Error('Too many children!');
-  }
-
-  /**
-   * Adds nodes as children of the node
-   * @param nodes nodes to add as children
-   * @throws will throw an error if there are already two children
-   */
-  addChildren(nodes: BSPNode[]) {
-    nodes.forEach((node) => this.addChild(node));
-  }
-}
-
-class BSPTree {
-  private root: BSPNode;
-
-  constructor(width: number, height: number) {
-    this.root = new BSPNode(0, 0, width, height);
-  }
-
-  /**
-   * @return {BSPNode} The root node of the BSP tree
-   */
-  getRoot(): BSPNode {
-    return this.root;
-  }
-}
-
-export default BSPTree;
+export default BSP;
