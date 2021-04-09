@@ -1,28 +1,63 @@
 import React, { useState, useEffect } from "react";
+import "./App.css";
 import Canvas from "./Canvas";
-import BSP, { generateRooms } from "./utils/BSP/BSP";
+import BSP, { generateRooms, getRoomDoors } from "./utils/BSP/BSP";
 import BSPTree from "./utils/BSP/BSPTree";
+import { getRoutes, Point } from "./utils/pathfinding/aStar";
 
 function App() {
   const [bspTree, setBSPTree] = useState<BSPTree | null>(null);
-  const [mapWidth, setMapWidth] = useState(1600);
-  const [mapHeight, setMapHeight] = useState(900);
-  const [minArea, setMinArea] = useState(1000);
-  const [padding, setPadding] = useState(10);
-  const [updatedMapWidth, setUpdatedMapWidth] = useState(1600);
-  const [updatedMapHeight, setUpdatedMapHeight] = useState(900);
-  const [updatedMinArea, setUpdatedMinArea] = useState(1000);
+  const [mapWidth, setMapWidth] = useState(500);
+  const [mapHeight, setMapHeight] = useState(500);
+  const [minArea, setMinArea] = useState(5000);
+  const [updatedMapWidth, setUpdatedMapWidth] = useState(500);
+  const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
+  const [updatedMinArea, setUpdatedMinArea] = useState(5000);
+  const [showLeafBoundaries, setShowLeafBoundaries] = useState(false);
+  const [doors, setDoors] = useState<Point[][]>([]);
+  const [routes, setRoutes] = useState<Point[][]>([]);
+  const [graph, setGraph] = useState<boolean[][]>([]);
 
   const generate = () => {
+    console.time("generateRooms");
+    const bspTree = BSP(updatedMapWidth, updatedMapHeight, {
+      minArea: updatedMinArea,
+    });
+
+    // Create a graph for pathfinding
+    const graph: boolean[][] = [];
+    for (let y = 0; y < updatedMapHeight; y++) {
+      graph.push([]);
+      for (let x = 0; x < updatedMapWidth; x++) {
+        graph[y].push(true);
+      }
+    }
+
+    // Generate rooms from the bspTree leaf nodes and store in state
+    const updatedGraph = generateRooms(bspTree.getLeaves(), graph);
+
+    console.timeEnd("generateRooms");
+
+    const doors = getRoomDoors(
+      bspTree
+        .getLeaves()
+        .filter((node) => node.getRoom())
+        .map((node) => node.getRoom()!)
+    );
+
+    let routes: Point[][] = [];
+    if (doors.length > 1) {
+      console.time("calculateRoutes");
+      routes = getRoutes(updatedGraph, doors);
+      console.timeEnd("calculateRoutes");
+    }
+    setDoors(doors);
+    setRoutes(routes);
     setMapWidth(updatedMapWidth);
     setMapHeight(updatedMapHeight);
     setMinArea(updatedMinArea);
-    const paddedMinArea = (updatedMinArea + padding * 2) * (padding * 2 + 1);
-    const bspTree = BSP(mapWidth, mapHeight, { minArea: paddedMinArea });
     setBSPTree(bspTree);
-
-    // Generate rooms from the bspTree leaf nodes and store in state
-    generateRooms(bspTree.getLeaves(), updatedMinArea, padding);
+    setGraph(updatedGraph);
   };
 
   useEffect(() => {
@@ -34,13 +69,13 @@ function App() {
 
   return (
     <div className="app">
-      <div>
+      <div className="settings">
         <label htmlFor="width">
           width
           <input
             id="width"
             value={updatedMapWidth}
-            onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value))}
+            onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) || 0)}
           />
         </label>
         <label htmlFor="height">
@@ -48,7 +83,7 @@ function App() {
           <input
             id="height"
             value={updatedMapHeight}
-            onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value))}
+            onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) || 0)}
           />
         </label>
         <label htmlFor="minArea">
@@ -56,15 +91,16 @@ function App() {
           <input
             id="minArea"
             value={updatedMinArea}
-            onChange={(e) => setUpdatedMinArea(parseInt(e.target.value))}
+            onChange={(e) => setUpdatedMinArea(parseInt(e.target.value) || 0)}
           />
         </label>
-        <label htmlFor="padding">
-          padding
+        <label htmlFor="showLeafBoundaries">
+          show leaf boundaries
           <input
-            id="padding"
-            value={padding}
-            onChange={(e) => setPadding(parseInt(e.target.value))}
+            type="checkbox"
+            id="showLeafBoundaries"
+            checked={showLeafBoundaries}
+            onChange={(e) => setShowLeafBoundaries(e.target.checked)}
           />
         </label>
         <input type="button" onClick={() => generate()} value="Generate" />
@@ -73,7 +109,11 @@ function App() {
         mapWidth={mapWidth}
         mapHeight={mapHeight}
         minArea={minArea}
+        showLeafBoundaries={showLeafBoundaries}
         leaves={bspTree?.getLeaves()}
+        routes={routes}
+        doors={doors}
+        graph={graph}
       />
     </div>
   );
