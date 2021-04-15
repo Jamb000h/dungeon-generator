@@ -1,14 +1,11 @@
-import { PriorityQueue } from "./PriorityQueue";
+import { PriorityQueue } from "../data-structures/PriorityQueue";
+import { MapPoint } from "../enums/MapPoint";
+import { Point } from "../interfaces/Point";
 
-export interface Point {
-  x: number;
-  y: number;
-}
-
-export const getRoutes = (graph: boolean[][], doors: Point[][]) => {
+export const getRoutes = (map: MapPoint[][], doors: Point[][]) => {
   const routes = [];
   for (let i = 0; i < doors.length - 1; i++) {
-    routes.push(aStar(doors[i][1], doors[i + 1][0], graph));
+    routes.push(aStar(doors[i][1], doors[i + 1][0], map));
   }
   console.log(routes);
   return routes;
@@ -18,10 +15,10 @@ export const getRoutes = (graph: boolean[][], doors: Point[][]) => {
  * Finds a route between two nodes
  * @param start start node
  * @param finish end node
- * @param graph graph for traversal
+ * @param map map for traversal
  * @return {array} route
  */
-const aStar = (start: Point, finish: Point, graph: boolean[][]): Point[] => {
+const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
   // Initialize bookkeeping variables
   const visited: { [key: string]: boolean } = {};
   const distances: { [key: string]: number } = {};
@@ -42,7 +39,11 @@ const aStar = (start: Point, finish: Point, graph: boolean[][]): Point[] => {
 
     // If we reached finish node, calculate and return route
     if (current.x === finish.x && current.y === finish.y) {
-      return route(key, parents);
+      const fastestRoute = route(key, parents);
+      // for (let i = 0; i < fastestRoute.length; i++) {
+      //   map[fastestRoute[i].y][fastestRoute[i].x] = null;
+      // }
+      return fastestRoute;
     }
 
     // Skip if visited already
@@ -52,7 +53,7 @@ const aStar = (start: Point, finish: Point, graph: boolean[][]): Point[] => {
     visited[key] = true;
 
     // Get valid directions
-    const validNeighbors = getValidNeighbors(current.x, current.y, graph);
+    const validNeighbors = getValidNeighbors(current.x, current.y, map);
 
     // Go through all valid directions and if this route is faster than the previous one,
     // mark this as the fastest route by updating bookkeeping
@@ -72,14 +73,20 @@ const aStar = (start: Point, finish: Point, graph: boolean[][]): Point[] => {
       // Calculate new distance
       const newDirectionDistance = current.priority + 1;
 
-      // Calculate heuristic - manhattan distance between node and finish
       const heuristic = manhattan({ y: neighborY, x: neighborX }, finish);
+
+      const modifier = 0;
+      //map[neighborY][neighborX] === MapPoint.ROOM ? heuristic : 0;
 
       // If new distance is faster, update bookkeeping
       if (newDirectionDistance < directionDistance) {
         distances[directionKey] = current.priority + 1;
         parents[directionKey] = key;
-        PQ.push(neighborX, neighborY, newDirectionDistance + heuristic);
+        PQ.push(
+          neighborX,
+          neighborY,
+          newDirectionDistance + heuristic + modifier
+        );
       }
     }
   }
@@ -87,22 +94,34 @@ const aStar = (start: Point, finish: Point, graph: boolean[][]): Point[] => {
   return [];
 };
 
-const getValidNeighbors = (x: number, y: number, graph: boolean[][]) => {
+const getValidNeighbors = (x: number, y: number, map: MapPoint[][]) => {
   const validNeighbors = [];
 
-  if (x - 1 >= 0 && graph[y][x - 1]) {
+  if (
+    x - 1 >= 0 &&
+    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x - 1])
+  ) {
     validNeighbors.push([y, x - 1]);
   }
 
-  if (x + 1 < graph[y].length && graph[y][x + 1]) {
+  if (
+    x + 1 < map[y].length &&
+    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x + 1])
+  ) {
     validNeighbors.push([y, x + 1]);
   }
 
-  if (y - 1 >= 0 && graph[y - 1][x]) {
+  if (
+    y - 1 >= 0 &&
+    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y - 1][x])
+  ) {
     validNeighbors.push([y - 1, x]);
   }
 
-  if (y + 1 < graph.length && graph[y + 1][x]) {
+  if (
+    y + 1 < map.length &&
+    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y + 1][x])
+  ) {
     validNeighbors.push([y + 1, x]);
   }
 

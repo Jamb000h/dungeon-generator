@@ -1,4 +1,5 @@
-import BSP, { canFitARoom, isTooDisproportionate } from "./BSP";
+import BSP from "./BSP";
+import { canFitARoom, isTooDisproportionate } from "./utils";
 
 describe("BSP", () => {
   describe("given minArea 2 and a 2x2 area", () => {
@@ -12,13 +13,13 @@ describe("BSP", () => {
     test("first child is the root node's left half", () => {
       const bspTree = BSP(2, 2, { minArea: 2 });
       const firstChild = bspTree.getRoot().getChildNodes()[0];
-      expect(firstChild.position).toEqual({ x: 0, y: 0, width: 1, height: 2 });
+      expect(firstChild.area).toEqual({ x: 0, y: 0, width: 1, height: 2 });
     });
 
     test("second child is the root node's right half", () => {
       const bspTree = BSP(2, 2, { minArea: 2 });
       const secondChild = bspTree.getRoot().getChildNodes()[1];
-      expect(secondChild.position).toEqual({ x: 1, y: 0, width: 1, height: 2 });
+      expect(secondChild.area).toEqual({ x: 1, y: 0, width: 1, height: 2 });
     });
   });
 

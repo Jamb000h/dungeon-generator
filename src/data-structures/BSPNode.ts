@@ -1,16 +1,8 @@
-import { Room } from "./BSP";
-
-export interface Position {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
+import { Area } from "../interfaces/Area";
 
 export class BSPNode {
   private childNodes: BSPNode[] = [];
-  readonly position: Position;
-  room?: Room;
+  readonly area: Area;
 
   /**
    * Create a new node for a BSP tree
@@ -30,7 +22,7 @@ export class BSPNode {
       throw new Error("width and height have to be at least 1");
     }
 
-    this.position = {
+    this.area = {
       x,
       y,
       width,
@@ -44,14 +36,6 @@ export class BSPNode {
    */
   getChildNodes(): BSPNode[] {
     return this.childNodes;
-  }
-
-  /**
-   * Returns the room attached to this node, or undefined if there's no room
-   * @return {Room | undefined} The room attached to this node or undefined
-   */
-  getRoom(): Room | undefined {
-    return this.room;
   }
 
   /**
@@ -86,42 +70,3 @@ export class BSPNode {
     nodes.forEach((node) => this.addChild(node));
   }
 }
-
-class BSPTree {
-  private root: BSPNode;
-
-  constructor(width: number, height: number) {
-    this.root = new BSPNode(0, 0, width, height);
-  }
-
-  /**
-   * Get the BSPTree root node
-   * @return {BSPNode} The root node of the BSP tree
-   */
-  getRoot(): BSPNode {
-    return this.root;
-  }
-
-  /**
-   * Find leaves starting from a node. To accomodate easy usage, if a node is not
-   * provided, the function is called with the BSP Tree root node.
-   * @param {BSPNode} node The BSPNode that start searching nodes from
-   * @return {BSPNode[]} All leaf nodes of the BSP tree
-   */
-  getLeaves(node?: BSPNode): BSPNode[] {
-    if (!node) {
-      return this.getLeaves(this.root);
-    }
-
-    // Leaf found, return
-    if (node.isLeaf()) return [node];
-
-    const children = node.getChildNodes();
-    const leftChildLeaves = this.getLeaves(children[0]);
-    const rightChildLeaves = this.getLeaves(children[1]);
-
-    return leftChildLeaves.concat(rightChildLeaves);
-  }
-}
-
-export default BSPTree;

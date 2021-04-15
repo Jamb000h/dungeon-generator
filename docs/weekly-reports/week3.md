@@ -10,7 +10,7 @@ This week I started implementing pathfinding by learning about A\* and how to im
 - A\* is "too good" - it starts hugging room walls quite quickly
   - My first hunch is to add some kind of modifier to nodes near rooms that discourages A\* from picking those nodes, which ultimately may lead to a bit longer routes, but reduces wall hugging. I'm yet to think of how to accomplish this while also ensuring the heuristic plays its part.
 - The total solution currently scales quite poorly. A 1000 x 1000 area gets pretty slow for pathfinding.
-  - Currently the only optimization is that I mark room pixels as false to prevent processing them during pathfinding. I should ditch them completely from the graph. I also want to look into directing the algorithm only towards the solution by limiting the search boundaries to be between route start and finish coordinates rather than the whole map.
+  - Currently the only optimization is that I mark room pixels as false to prevent processing them during pathfinding. I should ditch them completely from the map. I also want to look into directing the algorithm only towards the solution by limiting the search boundaries to be between route start and finish coordinates rather than the whole map.
 
 My main learning was about implementing a Priority Queue, as A\* itself was not too bad since it seems to just be a modified Dijkstra's algorithm that was already used on some more basic course in the curriculum. Priority Queue was not too bad either (although I did not implement all possible operations, but just the ones I need) and I got the test coverage for the data structure to above 90% already.
 

@@ -54,5 +54,12 @@ describe("PriorityQueue", () => {
       { priority: 6, x: 6, y: 6 },
       { priority: 7, x: 7, y: 7 },
     ]);
+    PQ.pop();
+    expect(PQ.getValues()).toEqual([
+      { priority: 2, x: 2, y: 2 },
+      { priority: 5, x: 5, y: 5 },
+      { priority: 7, x: 7, y: 7 },
+      { priority: 6, x: 6, y: 6 },
+    ]);
   });
 });
