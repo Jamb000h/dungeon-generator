@@ -47,12 +47,7 @@ function App() {
 
     // Generate rooms from the bspTree leaf nodes and store in state
     console.time("generateRooms");
-    const { map: updatedMap, rooms } = generateRooms(
-      bspTree.getLeaves(),
-      map,
-      updatedGridSize
-    );
-    map = updatedMap;
+    const { rooms } = generateRooms(bspTree.getLeaves(), map, updatedGridSize);
     console.timeEnd("generateRooms");
 
     // Generate grid for paths based on generated rooms

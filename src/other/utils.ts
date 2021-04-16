@@ -29,9 +29,11 @@ export const generateRooms = (
     const roomWidth =
       Math.floor((width - gridSize / 2) / 2) +
       Math.floor(Math.random() * ((width - gridSize / 2) / 2));
+
     const roomHeight =
       Math.floor((height - gridSize / 2) / 2) +
       Math.floor(Math.random() * ((height - gridSize / 2) / 2));
+
     const roomX = getRandomBetween(
       x + gridSize / 2,
       x + width - roomWidth - gridSize / 2
@@ -41,8 +43,10 @@ export const generateRooms = (
       y + height - roomHeight - gridSize / 2
     );
 
+    // Add room to rooms
     rooms.push({ x: roomX, y: roomY, height: roomHeight, width: roomWidth });
 
+    // Update map with room
     for (let y = roomY; y < roomY + roomHeight; y++) {
       for (let x = roomX; x < roomX + roomWidth; x++) {
         map[y][x] = MapPoint.ROOM;
@@ -51,6 +55,75 @@ export const generateRooms = (
   }
 
   return { map, rooms };
+};
+
+/**
+ * Generate doors for rooms
+ * @param map map where rooms reside
+ * @param rooms rooms to generate doors for
+ * @param gridSize grid size
+ * @return {array} an array of objects that contain inDoor and outDoor for each room
+ */
+export const generateDoors = (
+  map: MapPoint[][],
+  rooms: Area[],
+  gridSize: number
+): RoomDoors[] => {
+  const doors: RoomDoors[] = [];
+  for (let i = 0; i < rooms.length; i++) {
+    // Get the individual room
+    const room = rooms[i];
+
+    // Object to hold generated doors
+    const roomDoors: RoomDoors = {
+      inDoor: { x: 0, y: 0 },
+      outDoor: { x: 0, y: 0 },
+    };
+
+    // Get potential door directions based on room location in map
+    // to prevent doors too close to walls and corners
+    const potentialDoorDirections = getValidDoorDirections(room, map, gridSize);
+
+    // Get random door directions from valid directions
+    let doorDirections = [];
+
+    // Get first direction randomly and remove direction from list
+    const index = getRandomBetween(0, potentialDoorDirections.length);
+    doorDirections.push(potentialDoorDirections[index]);
+    potentialDoorDirections.splice(index, 1);
+
+    // Get second direction randomly
+    doorDirections.push(
+      potentialDoorDirections[
+        getRandomBetween(0, potentialDoorDirections.length)
+      ]
+    );
+
+    // For each door, generate a position
+    for (let d = 0; d < 2; d++) {
+      const direction = doorDirections[d];
+      const isIndoor = d === 0;
+
+      // Generate a door and set the point in map as a door
+      const { doorX, doorY } = generateDoor(direction, room, gridSize);
+      map[doorY][doorX] = MapPoint.DOOR;
+
+      // Update relevant variables
+      if (isIndoor) {
+        roomDoors.inDoor.x = doorX;
+        roomDoors.inDoor.y = doorY;
+        roomDoors.inDoor.direction = direction;
+      } else {
+        roomDoors.outDoor.x = doorX;
+        roomDoors.outDoor.y = doorY;
+        roomDoors.outDoor.direction = direction;
+      }
+    }
+
+    doors.push(roomDoors);
+  }
+
+  return doors;
 };
 
 /**
@@ -150,64 +223,6 @@ export const generateGrid = (map: MapPoint[][], gridSize: number) => {
   }
 };
 
-export const generateDoors = (
-  map: MapPoint[][],
-  rooms: Area[],
-  gridSize: number
-): RoomDoors[] => {
-  const doors: RoomDoors[] = [];
-  for (let i = 0; i < rooms.length; i++) {
-    // Get the individual room
-    const room = rooms[i];
-
-    // Object to hold generated doors
-    const roomDoors: RoomDoors = {
-      inDoor: { x: 0, y: 0 },
-      outDoor: { x: 0, y: 0 },
-    };
-
-    // Get potential door directions based on room location in map
-    // to prevent doors too close to walls and corners
-    const potentialDoorDirections = getValidDoorDirections(room, map, gridSize);
-
-    // Get random door directions from valid directions
-    let doorDirections = [];
-
-    const index = getRandomBetween(0, potentialDoorDirections.length);
-    doorDirections.push(potentialDoorDirections[index]);
-    potentialDoorDirections.splice(index, 1);
-
-    doorDirections.push(
-      potentialDoorDirections[
-        getRandomBetween(0, potentialDoorDirections.length)
-      ]
-    );
-
-    // For each door, generate a position
-    for (let d = 0; d < 2; d++) {
-      const direction = doorDirections[d];
-      const isIndoor = d === 0;
-
-      const { doorX, doorY } = generateDoor(direction, room, gridSize);
-      map[doorY][doorX] = MapPoint.DOOR;
-
-      if (isIndoor) {
-        roomDoors.inDoor.x = doorX;
-        roomDoors.inDoor.y = doorY;
-        roomDoors.inDoor.direction = direction;
-      } else {
-        roomDoors.outDoor.x = doorX;
-        roomDoors.outDoor.y = doorY;
-        roomDoors.outDoor.direction = direction;
-      }
-    }
-
-    doors.push(roomDoors);
-  }
-
-  return doors;
-};
-
 /**
  * Generate a single door on a room's wall
  * @param direction wall to generate the door on
@@ -226,19 +241,24 @@ const generateDoor = (
   let doorX;
   let doorY;
 
+  // Get min and max values for doors
   const { minX, maxX, minY, maxY } = calculateDoorLimits(room, gridSize);
 
   if (direction === Direction.TOP || direction === Direction.BOTTOM) {
+    // Get random x that is bound to grid
     doorX = getRandomBoundToGrid(minX, maxX, gridSize);
 
+    // set y to either top or bottom wall
     if (direction === Direction.TOP) {
       doorY = room.y;
     } else {
       doorY = room.y + room.height - 1;
     }
   } else {
+    // Get random y that is bound to grid
     doorY = getRandomBoundToGrid(minY, maxY, gridSize);
 
+    // set x to either left or right wall
     if (direction === Direction.LEFT) {
       doorX = room.x;
     } else {
@@ -252,6 +272,12 @@ const generateDoor = (
   };
 };
 
+/**
+ * Calculate minimum and maximum positions for doors
+ * @param room room to calculate positions for
+ * @param gridSize grid size to bind to
+ * @return {object} minimum and maximum coordinates for x and y
+ */
 export const calculateDoorLimits = (room: Area, gridSize: number) => {
   const minX = Math.floor(room.x / gridSize + 1) * gridSize;
   const maxX = Math.floor((room.x + room.width - 1) / gridSize) * gridSize;
@@ -266,6 +292,13 @@ export const calculateDoorLimits = (room: Area, gridSize: number) => {
   };
 };
 
+/**
+ * Returns a random number between given min and max bound to grid size
+ * @param min minimum value
+ * @param max maximum value
+ * @param gridSize grid size
+ * @return {number} a random number bound to grid size
+ */
 export const getRandomBoundToGrid = (
   min: number,
   max: number,
