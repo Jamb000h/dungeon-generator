@@ -6,33 +6,37 @@ import BSPTree from "../data-structures/BSPTree";
 import { getRoutes } from "../pathfinding/aStar";
 import { Point } from "../interfaces/Point";
 import {
-  getValidDoorDirections,
   generateMap,
   generateRooms,
+  generateGrid,
+  generateDoors,
 } from "../other/utils";
 import { MapPoint } from "../enums/MapPoint";
 
 function App() {
   const [bspTree, setBSPTree] = useState<BSPTree | null>(null);
-  const [mapWidth, setMapWidth] = useState(500);
+  const [mapWidth, setMapWidth] = useState(1000);
   const [mapHeight, setMapHeight] = useState(500);
-  const [minArea, setMinArea] = useState(5000);
-  const [gridSize, setGridSize] = useState(20);
-  const [updatedMapWidth, setUpdatedMapWidth] = useState(500);
+  const [minArea, setMinArea] = useState(15000);
+  const [updatedMapWidth, setUpdatedMapWidth] = useState(1000);
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
-  const [updatedMinArea, setUpdatedMinArea] = useState(5000);
+  const [updatedMinArea, setUpdatedMinArea] = useState(15000);
   const [updatedGridSize, setUpdatedGridSize] = useState(20);
   const [showLeafBoundaries, setShowLeafBoundaries] = useState(false);
-  const [doors, setDoors] = useState<Point[][]>([]);
+  const [doors, setDoors] = useState<{ inDoor: Point; outDoor: Point }[]>([]);
   const [routes, setRoutes] = useState<Point[][]>([]);
   const [map, setMap] = useState<MapPoint[][]>([]);
   const [showGrid, setShowGrid] = useState(false);
+  const [showRoutes, setShowRoutes] = useState(true);
+  const [showRooms, setShowRooms] = useState(true);
+  const [showDoors, setShowDoors] = useState(true);
 
   const generate = () => {
     // Run BSP to split area
     console.time("BSP");
     const bspTree = BSP(updatedMapWidth, updatedMapHeight, {
       minArea: updatedMinArea,
+      gridSize: updatedGridSize,
     });
     console.timeEnd("BSP");
 
@@ -43,123 +47,27 @@ function App() {
 
     // Generate rooms from the bspTree leaf nodes and store in state
     console.time("generateRooms");
-    const { map: updatedMap, rooms } = generateRooms(bspTree.getLeaves(), map);
+    const { map: updatedMap, rooms } = generateRooms(
+      bspTree.getLeaves(),
+      map,
+      updatedGridSize
+    );
     map = updatedMap;
     console.timeEnd("generateRooms");
 
     // Generate grid for paths based on generated rooms
-    // TODO: move to separate function
     console.time("generateGrid");
-
-    for (let y = 0; y < map.length; y++) {
-      for (let x = 0; x < map[y].length; x++) {
-        if (
-          (y % updatedGridSize === 0 || x % updatedGridSize === 0) &&
-          map[y][x] !== MapPoint.ROOM
-        ) {
-          map[y][x] = MapPoint.GRID;
-        }
-      }
-    }
-
+    generateGrid(map, updatedGridSize);
     console.timeEnd("generateGrid");
 
-    // Generate doors where grid and rooms intersect
-    // TODO: move to separate function
-    const doors: Point[][] = [];
+    // Generate doors for rooms
     console.time("generateDoors");
-    for (let i = 0; i < rooms.length; i++) {
-      const room = rooms[i];
-      const roomDoors = [];
-      const allowedDirections = getValidDoorDirections(
-        room,
-        map,
-        updatedGridSize
-      );
-      const doorsGenerated = {
-        left: false,
-        right: false,
-        top: false,
-        bottom: false,
-      };
-      for (let y = room.y; y < room.y + room.height; y++) {
-        if (y === room.y && !allowedDirections.top) {
-          continue;
-        }
-
-        if (y === room.y + room.height - 1 && !allowedDirections.bottom) {
-          continue;
-        }
-
-        for (let x = room.x; x < room.x + room.width; x++) {
-          if (roomDoors.length > 1) break;
-          if (y === room.y && doorsGenerated.top) {
-            continue;
-          }
-
-          if (y === room.y + room.height - 1 && doorsGenerated.bottom) {
-            continue;
-          }
-
-          if (x === room.x && doorsGenerated.left) {
-            continue;
-          }
-
-          if (x === room.x + room.width - 1 && doorsGenerated.right) {
-            continue;
-          }
-
-          if (x === room.x && !allowedDirections.left) {
-            continue;
-          }
-
-          if (x === room.x + room.width - 1 && !allowedDirections.right) {
-            continue;
-          }
-
-          if (
-            map[y][x] === MapPoint.ROOM &&
-            (map[y - 1][x] === MapPoint.GRID ||
-              map[y + 1][x] === MapPoint.GRID ||
-              map[y][x - 1] === MapPoint.GRID ||
-              map[y][x + 1] === MapPoint.GRID)
-          ) {
-            roomDoors.push({ y, x });
-            if (x === room.x) {
-              doorsGenerated.left = true;
-            }
-
-            if (x === room.x + room.width - 1) {
-              doorsGenerated.right = true;
-            }
-
-            if (y === room.y) {
-              doorsGenerated.top = true;
-            }
-
-            if (y === room.y + room.height - 1) {
-              doorsGenerated.bottom = true;
-            }
-          }
-        }
-      }
-
-      doors.push(roomDoors);
-    }
-
-    for (let i = 0; i < doors.length; i++) {
-      for (let j = 0; j < doors[i].length; j++) {
-        map[doors[i][j].y][doors[i][j].x] = MapPoint.DOOR;
-      }
-    }
+    const doors = generateDoors(map, rooms, updatedGridSize);
     console.timeEnd("generateDoors");
 
-    let routes: Point[][] = [];
-    if (doors.length > 1) {
-      console.time("calculateRoutes");
-      routes = getRoutes(map, doors);
-      console.timeEnd("calculateRoutes");
-    }
+    console.time("calculateRoutes");
+    const routes = getRoutes(map, doors, updatedGridSize);
+    console.timeEnd("calculateRoutes");
 
     setDoors(doors);
     setRoutes(routes);
@@ -168,7 +76,6 @@ function App() {
     setMinArea(updatedMinArea);
     setBSPTree(bspTree);
     setMap(map);
-    setGridSize(updatedGridSize);
   };
 
   useEffect(() => {
@@ -231,6 +138,33 @@ function App() {
             onChange={(e) => setShowGrid(e.target.checked)}
           />
         </label>
+        <label htmlFor="showRoutes">
+          show routes
+          <input
+            type="checkbox"
+            id="showRoutes"
+            checked={showRoutes}
+            onChange={(e) => setShowRoutes(e.target.checked)}
+          />
+        </label>
+        <label htmlFor="showRooms">
+          show rooms
+          <input
+            type="checkbox"
+            id="showRooms"
+            checked={showRooms}
+            onChange={(e) => setShowRooms(e.target.checked)}
+          />
+        </label>
+        <label htmlFor="showDoors">
+          show doors
+          <input
+            type="checkbox"
+            id="showDoors"
+            checked={showDoors}
+            onChange={(e) => setShowDoors(e.target.checked)}
+          />
+        </label>
         <input type="button" onClick={() => generate()} value="Generate" />
       </div>
       <Canvas
@@ -243,6 +177,9 @@ function App() {
         doors={doors}
         map={map}
         showGrid={showGrid}
+        showRoutes={showRoutes}
+        showRooms={showRooms}
+        showDoors={showDoors}
       />
     </div>
   );

@@ -5,14 +5,17 @@ import { SplitDirection } from "../enums/SplitDirection";
 
 interface Options {
   minArea?: number; // This means rectangle area, so width * height
+  gridSize?: number;
 }
 
 interface DefaultOptions {
   minArea: number;
+  gridSize: number;
 }
 
 const defaultOptions: DefaultOptions = {
   minArea: 100,
+  gridSize: 0,
 };
 
 /**
@@ -42,11 +45,11 @@ const BSP = (width: number, height: number, options: Options): BSPTree => {
  * @param options options to give to the algorithm.
  */
 const split = (node: BSPNode, options: Options & DefaultOptions) => {
-  const { minArea } = options;
+  const { minArea, gridSize } = options;
   const { x, y, width, height } = node.area;
 
   // Early return if we cannot sufficiently split the node to accomodate the minArea
-  if (!node.isLeaf() || !canSplit(minArea, width, height)) {
+  if (!node.isLeaf() || !canSplit(minArea, width, height, gridSize)) {
     return;
   }
 
@@ -58,7 +61,6 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
   if (splitDirection === SplitDirection.VERTICAL) {
     const minimumSplit = Math.ceil(minArea / height);
     const split = getRandomBetween(minimumSplit, width);
-    // const split = Math.ceil(width / 2);
 
     node.addChildren([
       new BSPNode(x, y, split, height),
@@ -67,7 +69,6 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
   } else {
     const minimumSplit = Math.ceil(minArea / width);
     const split = getRandomBetween(minimumSplit, height);
-    // const split = Math.ceil(height / 2);
 
     node.addChildren([
       new BSPNode(x, y, width, split),
@@ -88,8 +89,13 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
  * @param height height of current node
  * @return {boolean} true if can be split, false otherwise
  */
-const canSplit = (minArea: number, width: number, height: number): boolean => {
-  return width * height >= minArea * 2;
+const canSplit = (
+  minArea: number,
+  width: number,
+  height: number,
+  gridSize: number
+): boolean => {
+  return (width - gridSize) * (height - gridSize) >= minArea * 2;
 };
 
 export default BSP;

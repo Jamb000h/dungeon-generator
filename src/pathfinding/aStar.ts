@@ -1,13 +1,17 @@
 import { PriorityQueue } from "../data-structures/PriorityQueue";
 import { MapPoint } from "../enums/MapPoint";
 import { Point } from "../interfaces/Point";
+import { RoomDoors } from "../interfaces/RoomDoors";
 
-export const getRoutes = (map: MapPoint[][], doors: Point[][]) => {
+export const getRoutes = (
+  map: MapPoint[][],
+  doors: RoomDoors[],
+  gridSize: number
+) => {
   const routes = [];
   for (let i = 0; i < doors.length - 1; i++) {
-    routes.push(aStar(doors[i][1], doors[i + 1][0], map));
+    routes.push(aStar(doors[i].outDoor, doors[i + 1].inDoor, map, gridSize));
   }
-  console.log(routes);
   return routes;
 };
 
@@ -18,7 +22,12 @@ export const getRoutes = (map: MapPoint[][], doors: Point[][]) => {
  * @param map map for traversal
  * @return {array} route
  */
-const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
+const aStar = (
+  start: Point,
+  finish: Point,
+  map: MapPoint[][],
+  gridSize: number
+): Point[] => {
   // Initialize bookkeeping variables
   const visited: { [key: string]: boolean } = {};
   const distances: { [key: string]: number } = {};
@@ -40,9 +49,6 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
     // If we reached finish node, calculate and return route
     if (current.x === finish.x && current.y === finish.y) {
       const fastestRoute = route(key, parents);
-      // for (let i = 0; i < fastestRoute.length; i++) {
-      //   map[fastestRoute[i].y][fastestRoute[i].x] = null;
-      // }
       return fastestRoute;
     }
 
@@ -75,18 +81,11 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
 
       const heuristic = manhattan({ y: neighborY, x: neighborX }, finish);
 
-      const modifier = 0;
-      //map[neighborY][neighborX] === MapPoint.ROOM ? heuristic : 0;
-
       // If new distance is faster, update bookkeeping
       if (newDirectionDistance < directionDistance) {
         distances[directionKey] = current.priority + 1;
         parents[directionKey] = key;
-        PQ.push(
-          neighborX,
-          neighborY,
-          newDirectionDistance + heuristic + modifier
-        );
+        PQ.push(neighborX, neighborY, newDirectionDistance + heuristic);
       }
     }
   }
@@ -97,35 +96,33 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
 const getValidNeighbors = (x: number, y: number, map: MapPoint[][]) => {
   const validNeighbors = [];
 
-  if (
-    x - 1 >= 0 &&
-    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x - 1])
-  ) {
+  if (isValidNeighbor(x - 1, y, map)) {
     validNeighbors.push([y, x - 1]);
   }
 
-  if (
-    x + 1 < map[y].length &&
-    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x + 1])
-  ) {
+  if (isValidNeighbor(x + 1, y, map)) {
     validNeighbors.push([y, x + 1]);
   }
 
-  if (
-    y - 1 >= 0 &&
-    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y - 1][x])
-  ) {
+  if (isValidNeighbor(x, y - 1, map)) {
     validNeighbors.push([y - 1, x]);
   }
 
-  if (
-    y + 1 < map.length &&
-    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y + 1][x])
-  ) {
+  if (isValidNeighbor(x, y + 1, map)) {
     validNeighbors.push([y + 1, x]);
   }
 
   return validNeighbors;
+};
+
+const isValidNeighbor = (x: number, y: number, map: MapPoint[][]) => {
+  return (
+    y >= 0 &&
+    y < map.length &&
+    x >= 0 &&
+    x < map[y].length &&
+    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x])
+  );
 };
 
 const route = (key: string, parents: { [key: string]: string }): Point[] => {

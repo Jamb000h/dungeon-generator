@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { BSPNode } from "../data-structures/BSPNode";
 import { MapPoint } from "../enums/MapPoint";
 import { Point } from "../interfaces/Point";
+import { RoomDoors } from "../interfaces/RoomDoors";
 import "./Canvas.css";
 
 interface Props {
@@ -11,9 +12,12 @@ interface Props {
   showLeafBoundaries: boolean;
   routes: Point[][];
   leaves?: BSPNode[];
-  doors: Point[][];
+  doors: RoomDoors[];
   map: MapPoint[][];
   showGrid: boolean;
+  showRoutes: boolean;
+  showRooms: boolean;
+  showDoors: boolean;
 }
 
 const Canvas = (props: Props) => {
@@ -34,23 +38,46 @@ const Canvas = (props: Props) => {
           context.fillRect(x, y, 1, 1);
         }
 
-        if (props.map[y][x] === MapPoint.ROOM) {
+        if (
+          (props.showRooms && props.map[y][x] === MapPoint.ROOM) ||
+          props.map[y][x] === MapPoint.DOOR
+        ) {
           context.fillStyle = "#000";
           context.fillRect(x, y, 1, 1);
         }
       }
     }
 
-    for (let i = 0; i < props.doors.length; i++) {
-      context.fillStyle = "#F0F";
-      context.fillRect(props.doors[i][0].x, props.doors[i][0].y, 6, 6);
-      context.fillRect(props.doors[i][1].x - 1, props.doors[i][1].y, 6, 6);
+    if (props.showDoors) {
+      for (let i = 0; i < props.doors.length; i++) {
+        context.fillStyle = "#FF0000";
+
+        if (i > 0) {
+          context.fillRect(
+            props.doors[i].inDoor.x - 1,
+            props.doors[i].inDoor.y - 1,
+            3,
+            3
+          );
+        }
+
+        if (i < props.doors.length - 1) {
+          context.fillRect(
+            props.doors[i].outDoor.x - 1,
+            props.doors[i].outDoor.y - 1,
+            3,
+            3
+          );
+        }
+      }
     }
 
-    for (let i = 0; i < props.routes.length; i++) {
-      for (let j = 0; j < props.routes[i].length; j++) {
-        context.fillStyle = "#FF0000";
-        context.fillRect(props.routes[i][j].x, props.routes[i][j].y, 2, 2);
+    if (props.showRoutes) {
+      for (let i = 0; i < props.routes.length; i++) {
+        for (let j = 0; j < props.routes[i].length; j++) {
+          context.fillStyle = "#FF0000";
+          context.fillRect(props.routes[i][j].x, props.routes[i][j].y, 2, 2);
+        }
       }
     }
 
@@ -69,6 +96,9 @@ const Canvas = (props: Props) => {
     props.doors,
     props.map,
     props.showGrid,
+    props.showRoutes,
+    props.showRooms,
+    props.showDoors,
   ]);
 
   return (
