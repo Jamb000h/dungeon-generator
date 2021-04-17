@@ -6,8 +6,7 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 
 - contain multiple rooms (done)
 - may contain rooms that are very different in size (done)
-- contain routes between rooms
-- may contain rooms that connect to each other
+- contain routes between rooms (done)
 - ensures that all rooms are accessible without too long detours
 
 ## Commands
