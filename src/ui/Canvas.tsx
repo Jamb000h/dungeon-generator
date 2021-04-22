@@ -48,9 +48,18 @@ const Canvas = (props: Props) => {
       }
     }
 
+    if (props.showRoutes) {
+      for (let i = 0; i < props.routes.length; i++) {
+        for (let j = 0; j < props.routes[i].length; j++) {
+          context.fillStyle = "#FF0000";
+          context.fillRect(props.routes[i][j].x, props.routes[i][j].y, 2, 2);
+        }
+      }
+    }
+
     if (props.showDoors) {
       for (let i = 0; i < props.doors.length; i++) {
-        context.fillStyle = "#FF0000";
+        context.fillStyle = "#FFF000";
 
         if (i > 0) {
           context.fillRect(
@@ -68,15 +77,6 @@ const Canvas = (props: Props) => {
             3,
             3
           );
-        }
-      }
-    }
-
-    if (props.showRoutes) {
-      for (let i = 0; i < props.routes.length; i++) {
-        for (let j = 0; j < props.routes[i].length; j++) {
-          context.fillStyle = "#FF0000";
-          context.fillRect(props.routes[i][j].x, props.routes[i][j].y, 2, 2);
         }
       }
     }

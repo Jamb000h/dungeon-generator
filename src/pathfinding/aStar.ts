@@ -34,16 +34,16 @@ const aStar = (
   const parents: { [key: string]: string } = {};
 
   // Instantiate a new Priority Queue
-  const PQ = new PriorityQueue();
+  const queue = new PriorityQueue();
 
   // Add start node to bookkeeping and Priority Queue
-  PQ.push(start.x, start.y, 0);
+  queue.push(start.x, start.y, 0);
   parents[`${start.y}-${start.x}`] = `${start.y}-${start.x}`;
   distances[`${start.y}-${start.x}`] = 0;
 
-  while (!PQ.isEmpty()) {
+  while (!queue.isEmpty()) {
     // Get the desired value and parse a key to use with bookkeeping
-    const current = PQ.pop();
+    const current = queue.pop();
     const key = `${current.y}-${current.x}`;
 
     // If we reached finish node, calculate and return route
@@ -85,7 +85,7 @@ const aStar = (
       if (newDirectionDistance < directionDistance) {
         distances[directionKey] = current.priority + 1;
         parents[directionKey] = key;
-        PQ.push(neighborX, neighborY, newDirectionDistance + heuristic);
+        queue.push(neighborX, neighborY, newDirectionDistance + heuristic);
       }
     }
   }

@@ -52,7 +52,7 @@ export class PriorityQueue {
   /**
    * Moves the last value of the queue until it is in correct position
    */
-  moveUp() {
+  private moveUp() {
     let index = this.values.length - 1;
     // As long as current node is has a smaller priority than the parent, swap with parent
     // and stop if the current node becomes the first one
@@ -73,7 +73,7 @@ export class PriorityQueue {
   /**
    * Moves the first node of the queue until it is in correct position
    */
-  moveDown() {
+  private moveDown() {
     // Start at the first value
     let currentIndex = 0;
     let smallestIndex = 0;
@@ -118,7 +118,7 @@ export class PriorityQueue {
    * @param i index of value 1
    * @param j index of value 2
    */
-  swap(i: number, j: number) {
+  private swap(i: number, j: number) {
     const temp = { ...this.values[i] };
     this.values[i] = { ...this.values[j] };
     this.values[j] = { ...temp };

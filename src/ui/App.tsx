@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
 import Canvas from "./Canvas";
-import BSP from "../other/BSP";
 import BSPTree from "../data-structures/BSPTree";
-import { getRoutes } from "../pathfinding/aStar";
 import { Point } from "../interfaces/Point";
-import {
-  generateMap,
-  generateRooms,
-  generateGrid,
-  generateDoors,
-} from "../other/utils";
+import { generateDungeon } from "../other/utils";
 import { MapPoint } from "../enums/MapPoint";
 
 function App() {
@@ -22,60 +15,35 @@ function App() {
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
   const [updatedMinArea, setUpdatedMinArea] = useState(15000);
   const [updatedGridSize, setUpdatedGridSize] = useState(20);
-  const [showLeafBoundaries, setShowLeafBoundaries] = useState(false);
   const [doors, setDoors] = useState<{ inDoor: Point; outDoor: Point }[]>([]);
   const [routes, setRoutes] = useState<Point[][]>([]);
   const [map, setMap] = useState<MapPoint[][]>([]);
+  const [showLeafBoundaries, setShowLeafBoundaries] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [showRoutes, setShowRoutes] = useState(true);
   const [showRooms, setShowRooms] = useState(true);
   const [showDoors, setShowDoors] = useState(true);
 
   const generate = () => {
-    // Run BSP to split area
-    console.time("BSP");
-    const bspTree = BSP(updatedMapWidth, updatedMapHeight, {
-      minArea: updatedMinArea,
-      gridSize: updatedGridSize,
-    });
-    console.timeEnd("BSP");
+    const dungeon = generateDungeon(
+      updatedMapWidth,
+      updatedMapHeight,
+      updatedMinArea,
+      updatedGridSize
+    );
 
-    // Create a map for pathfinding and visualization
-    console.time("generateMap");
-    let map = generateMap(updatedMapHeight, updatedMapWidth);
-    console.timeEnd("generateMap");
-
-    // Generate rooms from the bspTree leaf nodes and store in state
-    console.time("generateRooms");
-    const { rooms } = generateRooms(bspTree.getLeaves(), map, updatedGridSize);
-    console.timeEnd("generateRooms");
-
-    // Generate grid for paths based on generated rooms
-    console.time("generateGrid");
-    generateGrid(map, updatedGridSize);
-    console.timeEnd("generateGrid");
-
-    // Generate doors for rooms
-    console.time("generateDoors");
-    const doors = generateDoors(map, rooms, updatedGridSize);
-    console.timeEnd("generateDoors");
-
-    console.time("calculateRoutes");
-    const routes = getRoutes(map, doors, updatedGridSize);
-    console.timeEnd("calculateRoutes");
-
-    setDoors(doors);
-    setRoutes(routes);
+    // Set UI state
+    setDoors(dungeon.doors);
+    setRoutes(dungeon.routes);
     setMapWidth(updatedMapWidth);
     setMapHeight(updatedMapHeight);
     setMinArea(updatedMinArea);
-    setBSPTree(bspTree);
-    setMap(map);
+    setBSPTree(dungeon.bspTree);
+    setMap(dungeon.map);
   };
 
   useEffect(() => {
-    // When loading UI, if there's no BSP Tree
-    // Generate one and store it in state
+    // When loading UI, generate a dungeong
     generate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

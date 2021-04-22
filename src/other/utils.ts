@@ -3,6 +3,8 @@ import { Area } from "../interfaces/Area";
 import { MapPoint } from "../enums/MapPoint";
 import { Direction } from "../enums/Direction";
 import { RoomDoors } from "../interfaces/RoomDoors";
+import { getRoutes } from "../pathfinding/aStar";
+import BSP from "./BSP";
 
 /**
  * Generates rooms given a list of nodes.
@@ -68,7 +70,7 @@ export const generateDoors = (
   map: MapPoint[][],
   rooms: Area[],
   gridSize: number
-): RoomDoors[] => {
+): { map: MapPoint[][]; doors: RoomDoors[] } => {
   const doors: RoomDoors[] = [];
   for (let i = 0; i < rooms.length; i++) {
     // Get the individual room
@@ -123,7 +125,7 @@ export const generateDoors = (
     doors.push(roomDoors);
   }
 
-  return doors;
+  return { map, doors };
 };
 
 /**
@@ -209,6 +211,7 @@ export const generateMap = (height: number, width: number): MapPoint[][] => {
  * Updates a map to contain grid where there isn't a room
  * @param map map to generate grid on
  * @param gridSize grid size
+ * @return {Object} a map with a pathfinding grid
  */
 export const generateGrid = (map: MapPoint[][], gridSize: number) => {
   for (let y = 0; y < map.length; y++) {
@@ -221,6 +224,8 @@ export const generateGrid = (map: MapPoint[][], gridSize: number) => {
       }
     }
   }
+
+  return map;
 };
 
 /**
@@ -306,4 +311,71 @@ export const getRandomBoundToGrid = (
 ) => {
   const randomX = getRandomBetween(min, max);
   return Math.floor(randomX / gridSize) * gridSize;
+};
+
+/**
+ * Generates a dungeon's building parts:
+ * - a tree of areas to generate rooms in
+ * - a grid for pathfinding
+ * - rooms
+ * - doors for rooms
+ * - routes between doors
+ * @param width width of map
+ * @param height height of map
+ * @param minArea minimum area of a room
+ * @param gridSize size of the pathfinding grid
+ * @return {Object} an object with a BSP tree, map and routes
+ */
+export const generateDungeon = (
+  width: number,
+  height: number,
+  minArea: number,
+  gridSize: number
+) => {
+  // Run BSP to split area
+  console.time("BSP");
+  const bspTree = BSP(width, height, {
+    minArea: minArea,
+    gridSize: gridSize,
+  });
+  console.timeEnd("BSP");
+
+  // Create a map for pathfinding and visualization
+  console.time("generateMap");
+  const map = generateMap(height, width);
+  console.timeEnd("generateMap");
+
+  // Generate rooms from the bspTree leaf nodes and store in state
+  console.time("generateRooms");
+  const { rooms, map: mapWithRooms } = generateRooms(
+    bspTree.getLeaves(),
+    map,
+    gridSize
+  );
+  console.timeEnd("generateRooms");
+
+  // Generate grid for paths based on generated rooms
+  console.time("generateGrid");
+  const mapWithPathfindingGrid = generateGrid(mapWithRooms, gridSize);
+  console.timeEnd("generateGrid");
+
+  // Generate doors for rooms
+  console.time("generateDoors");
+  const { doors, map: mapWithDoors } = generateDoors(
+    mapWithPathfindingGrid,
+    rooms,
+    gridSize
+  );
+  console.timeEnd("generateDoors");
+
+  console.time("calculateRoutes");
+  const routes = getRoutes(mapWithDoors, doors, gridSize);
+  console.timeEnd("calculateRoutes");
+
+  return {
+    routes,
+    doors,
+    bspTree,
+    map: mapWithDoors,
+  };
 };
