@@ -7,7 +7,7 @@ import {
   getRandomBetween,
   getValidDoorDirections,
   generateGrid,
-} from "./utils";
+} from "../other/utils";
 
 describe("getRandomBetween", () => {
   test("returns correctly for 0", () => {

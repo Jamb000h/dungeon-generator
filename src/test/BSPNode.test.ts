@@ -1,4 +1,4 @@
-import { BSPNode } from "./BSPNode";
+import { BSPNode } from "../data-structures/BSPNode";
 
 describe("BSPNode", () => {
   test("can be initialized with proper values", () => {

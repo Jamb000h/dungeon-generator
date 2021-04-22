@@ -333,44 +333,33 @@ export const generateDungeon = (
   gridSize: number
 ) => {
   // Run BSP to split area
-  console.time("BSP");
   const bspTree = BSP(width, height, {
     minArea: minArea,
     gridSize: gridSize,
   });
-  console.timeEnd("BSP");
 
   // Create a map for pathfinding and visualization
-  console.time("generateMap");
   const map = generateMap(height, width);
-  console.timeEnd("generateMap");
 
   // Generate rooms from the bspTree leaf nodes and store in state
-  console.time("generateRooms");
   const { rooms, map: mapWithRooms } = generateRooms(
     bspTree.getLeaves(),
     map,
     gridSize
   );
-  console.timeEnd("generateRooms");
 
   // Generate grid for paths based on generated rooms
-  console.time("generateGrid");
   const mapWithPathfindingGrid = generateGrid(mapWithRooms, gridSize);
-  console.timeEnd("generateGrid");
 
   // Generate doors for rooms
-  console.time("generateDoors");
   const { doors, map: mapWithDoors } = generateDoors(
     mapWithPathfindingGrid,
     rooms,
     gridSize
   );
-  console.timeEnd("generateDoors");
 
-  console.time("calculateRoutes");
+  // Generate routes between doors
   const routes = getRoutes(mapWithDoors, doors, gridSize);
-  console.timeEnd("calculateRoutes");
 
   return {
     routes,

@@ -1,4 +1,4 @@
-import { PriorityQueue } from "./PriorityQueue";
+import { PriorityQueue } from "../data-structures/PriorityQueue";
 
 describe("PriorityQueue", () => {
   test("initializes as empty", () => {

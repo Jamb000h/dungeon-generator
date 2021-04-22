@@ -1,5 +1,5 @@
-import BSP from "./BSP";
-import { canFitARoom, isTooDisproportionate } from "./utils";
+import BSP from "../other/BSP";
+import { canFitARoom, isTooDisproportionate } from "../other/utils";
 
 describe("BSP", () => {
   describe("given minArea 2 and a 2x2 area", () => {
