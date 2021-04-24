@@ -31,3 +31,5 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 [Week 3](docs/weekly-reports/week3.md)
 
 [Week 4](docs/weekly-reports/week4.md)
+
+[Week 5](docs/weekly-reports/week5.md)
