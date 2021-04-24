@@ -3,14 +3,10 @@ import { MapPoint } from "../enums/MapPoint";
 import { Point } from "../interfaces/Point";
 import { RoomDoors } from "../interfaces/RoomDoors";
 
-export const getRoutes = (
-  map: MapPoint[][],
-  doors: RoomDoors[],
-  gridSize: number
-) => {
+export const getRoutes = (map: MapPoint[][], doors: RoomDoors[]) => {
   const routes = [];
   for (let i = 0; i < doors.length - 1; i++) {
-    routes.push(aStar(doors[i].outDoor, doors[i + 1].inDoor, map, gridSize));
+    routes.push(aStar(doors[i].outDoor, doors[i + 1].inDoor, map));
   }
   return routes;
 };
@@ -22,12 +18,7 @@ export const getRoutes = (
  * @param map map for traversal
  * @return {array} route
  */
-const aStar = (
-  start: Point,
-  finish: Point,
-  map: MapPoint[][],
-  gridSize: number
-): Point[] => {
+const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
   // Initialize bookkeeping variables
   const visited: { [key: string]: boolean } = {};
   const distances: { [key: string]: number } = {};

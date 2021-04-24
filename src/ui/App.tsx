@@ -7,7 +7,6 @@ import { generateDungeon } from "../other/utils";
 import { MapPoint } from "../enums/MapPoint";
 import { BellsAndWhistles } from "./BellsAndWhistles";
 import { Log } from "./Log";
-import { Dungeon } from "../enums/Dungeon";
 
 function App() {
   const [bspTree, setBSPTree] = useState<BSPTree | null>(null);

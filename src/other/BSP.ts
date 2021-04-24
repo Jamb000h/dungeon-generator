@@ -30,7 +30,7 @@ const BSP = (width: number, height: number, options: Options): BSPTree => {
   // Generate the BSP tree by splitting the root node until it cannot be split anymore
   // splitting is a recursive operation
   const root = tree.getRoot();
-  split(root, 0, opts);
+  split(root, opts);
 
   return tree;
 };
@@ -42,15 +42,11 @@ const BSP = (width: number, height: number, options: Options): BSPTree => {
  * @param splits splits currently done
  * @param options options to give to the algorithm.
  */
-const split = (
-  node: BSPNode,
-  splits: number,
-  options: Options & DefaultOptions
-) => {
+const split = (node: BSPNode, options: Options & DefaultOptions) => {
   const { gridSize } = options;
   const { x, y, width, height } = node.area;
 
-  // Early return if we cannot sufficiently split the node to accomodate the minArea
+  // Early return if we cannot sufficiently split the node to accomodate a room if split
   if (!node.isLeaf() || !canSplit(width, height, gridSize)) {
     return;
   }
@@ -82,7 +78,7 @@ const split = (
 
   // Run split on the node's children
   for (let i = 0; i < node.getChildNodes().length; i++) {
-    split(node.getChildNodes()[i], splits + 1, options);
+    split(node.getChildNodes()[i], options);
   }
 };
 

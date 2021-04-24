@@ -365,7 +365,7 @@ export const generateDungeon = (
   );
 
   // Generate routes between doors
-  const routes = getRoutes(mapWithDoors, doors, gridSize);
+  const routes = getRoutes(mapWithDoors, doors);
 
   return {
     routes,
