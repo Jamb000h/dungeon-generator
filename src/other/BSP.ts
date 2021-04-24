@@ -4,17 +4,14 @@ import { getRandomBetween } from "./utils";
 import { SplitDirection } from "../enums/SplitDirection";
 
 interface Options {
-  minArea?: number; // This means rectangle area, so width * height
   gridSize?: number;
 }
 
 interface DefaultOptions {
-  minArea: number;
   gridSize: number;
 }
 
 const defaultOptions: DefaultOptions = {
-  minArea: 100,
   gridSize: 0,
 };
 
@@ -33,7 +30,7 @@ const BSP = (width: number, height: number, options: Options): BSPTree => {
   // Generate the BSP tree by splitting the root node until it cannot be split anymore
   // splitting is a recursive operation
   const root = tree.getRoot();
-  split(root, opts);
+  split(root, 0, opts);
 
   return tree;
 };
@@ -42,14 +39,19 @@ const BSP = (width: number, height: number, options: Options): BSPTree => {
  * Splits a node into two separate nodes and continues by trying to split both
  * of the generated nodes recursively
  * @param node a node to split
+ * @param splits splits currently done
  * @param options options to give to the algorithm.
  */
-const split = (node: BSPNode, options: Options & DefaultOptions) => {
-  const { minArea, gridSize } = options;
+const split = (
+  node: BSPNode,
+  splits: number,
+  options: Options & DefaultOptions
+) => {
+  const { gridSize } = options;
   const { x, y, width, height } = node.area;
 
   // Early return if we cannot sufficiently split the node to accomodate the minArea
-  if (!node.isLeaf() || !canSplit(minArea, width, height, gridSize)) {
+  if (!node.isLeaf() || !canSplit(width, height, gridSize)) {
     return;
   }
 
@@ -59,16 +61,18 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
     width >= height ? SplitDirection.VERTICAL : SplitDirection.HORIZONTAL;
 
   if (splitDirection === SplitDirection.VERTICAL) {
-    const minimumSplit = Math.ceil(minArea / height);
-    const split = getRandomBetween(minimumSplit, width);
+    const minimumSplit = gridSize * 2;
+    const maxSplit = width - 1;
+    const split = getRandomBetween(minimumSplit, maxSplit);
 
     node.addChildren([
       new BSPNode(x, y, split, height),
       new BSPNode(x + split, y, width - split, height),
     ]);
   } else {
-    const minimumSplit = Math.ceil(minArea / width);
-    const split = getRandomBetween(minimumSplit, height);
+    const minimumSplit = gridSize * 2;
+    const maxSplit = height;
+    const split = getRandomBetween(minimumSplit, maxSplit);
 
     node.addChildren([
       new BSPNode(x, y, width, split),
@@ -78,24 +82,23 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
 
   // Run split on the node's children
   for (let i = 0; i < node.getChildNodes().length; i++) {
-    split(node.getChildNodes()[i], options);
+    split(node.getChildNodes()[i], splits + 1, options);
   }
 };
 
 /**
  * Checks if a node can be split
- * @param minArea minimum area of a room
  * @param width width of current node
  * @param height height of current node
+ * @param gridSize size of the pathfinding grid
  * @return {boolean} true if can be split, false otherwise
  */
-const canSplit = (
-  minArea: number,
-  width: number,
-  height: number,
-  gridSize: number
-): boolean => {
-  return (width - gridSize) * (height - gridSize) >= minArea * 2;
+const canSplit = (width: number, height: number, gridSize: number): boolean => {
+  if (width > gridSize * 6 || height > gridSize * 6) {
+    return true;
+  }
+
+  return false;
 };
 
 export default BSP;

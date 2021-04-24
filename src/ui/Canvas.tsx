@@ -8,7 +8,6 @@ import "./Canvas.css";
 interface Props {
   mapWidth: number;
   mapHeight: number;
-  minArea: number;
   showLeafBoundaries: boolean;
   routes: Point[][];
   leaves?: BSPNode[];

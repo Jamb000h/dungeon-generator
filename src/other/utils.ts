@@ -5,11 +5,13 @@ import { Direction } from "../enums/Direction";
 import { RoomDoors } from "../interfaces/RoomDoors";
 import { getRoutes } from "../pathfinding/aStar";
 import BSP from "./BSP";
+import { Dungeon } from "../enums/Dungeon";
 
 /**
  * Generates rooms given a list of nodes.
  * @param nodes a list of nodes to generate rooms from
- * @param minArea minimum area of a
+ * @param map a map to generate rooms in
+ * @param gridSize size of the pathfinding grid
  */
 export const generateRooms = (
   nodes: BSPNode[],
@@ -23,27 +25,17 @@ export const generateRooms = (
     const { x, y, width, height } = node.area;
 
     // Early continue if node is too disproportionate
-    if (isTooDisproportionate(width, height)) {
+    if (isTooDisproportionate(width, height, gridSize)) {
       continue;
     }
 
     // Calculate room size and position
-    const roomWidth =
-      Math.floor((width - gridSize / 2) / 2) +
-      Math.floor(Math.random() * ((width - gridSize / 2) / 2));
+    const roomWidth = width - gridSize;
 
-    const roomHeight =
-      Math.floor((height - gridSize / 2) / 2) +
-      Math.floor(Math.random() * ((height - gridSize / 2) / 2));
+    const roomHeight = height - gridSize;
 
-    const roomX = getRandomBetween(
-      x + gridSize / 2,
-      x + width - roomWidth - gridSize / 2
-    );
-    const roomY = getRandomBetween(
-      y + gridSize / 2,
-      y + height - roomHeight - gridSize / 2
-    );
+    const roomX = Math.floor(x + gridSize / 2);
+    const roomY = Math.floor(y + gridSize / 2);
 
     // Add room to rooms
     rooms.push({ x: roomX, y: roomY, height: roomHeight, width: roomWidth });
@@ -137,8 +129,13 @@ export const generateDoors = (
  */
 export const isTooDisproportionate = (
   width: number,
-  height: number
+  height: number,
+  gridSize: number
 ): boolean => {
+  if (width < gridSize * 2 || height < gridSize * 2) {
+    return true;
+  }
+
   return height > 3 * width || width > 3 * height;
 };
 
@@ -154,17 +151,17 @@ export const getRandomBetween = (min: number, max: number): number => {
 
 /**
  * Checks if a node can fit a room
- * @param minArea minimum area of a room
  * @param width width of current node
  * @param height height of current node
+ * @param gridSize size of pathfinding grid
  * @return {boolean} true can fit a room, false otherwise
  */
 export const canFitARoom = (
-  minArea: number,
   height: number,
-  width: number
+  width: number,
+  gridSize: number
 ): boolean => {
-  return height * width >= minArea;
+  return height >= gridSize * 2 && width >= gridSize * 2;
 };
 
 /**
@@ -322,19 +319,28 @@ export const getRandomBoundToGrid = (
  * - routes between doors
  * @param width width of map
  * @param height height of map
- * @param minArea minimum area of a room
  * @param gridSize size of the pathfinding grid
- * @return {Object} an object with a BSP tree, map and routes
+ * @return {Object} an object with a BSP tree, map and routes or an error message
  */
 export const generateDungeon = (
   width: number,
   height: number,
-  minArea: number,
   gridSize: number
-) => {
+): Dungeon => {
+  if (width < 100) {
+    throw new Error("minimum width is 100");
+  }
+
+  if (height < 100) {
+    throw new Error("minimum height is 100");
+  }
+
+  if (gridSize > width / 4 || gridSize > height / 4) {
+    throw new Error("grid size too large");
+  }
+
   // Run BSP to split area
   const bspTree = BSP(width, height, {
-    minArea: minArea,
     gridSize: gridSize,
   });
 

@@ -23,6 +23,44 @@ All files          |   52.61 |    57.95 |   75.68 |   52.59 |
 -------------------|---------|----------|---------|---------|-----------------------
 ```
 
+## Performance testing
+
+### Complete dungeon generation
+
+There are performance tests testing the following scenarios:
+
+- A 1000 x 1000 dungeon generated 5 times with a minimum room size of 10000 and a pathfinding grid size of 20
+- A 1920 x 1080 (typical full screen) dungeon generated 5 times with a minimum room size of 10000 and a pathfinding grid size of 20
+- A 1000 x h dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - h increases in increments of 100 and starts at 1000
+- A w x 1000 dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - w increases in increments of 100 and starts at 1000
+- A w x h dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - both w and h increase in increments of 100 and start at 1000
+
+#### Performance testing results for complete dungeon generation (Averages after 3 runs)
+
+- 1000 x 1000: 920ms
+- 1920 x 1080: 1816ms
+- 1000 x h maximum area in 5000ms: 3180000
+- w x 1000 maximum area in 5000ms: 2720000
+- w x h maximum area in 5000ms: 3063600
+
+### BSP
+
+Splitting the dungeon was tested with the following map sizes:
+
+- 1000 x 1000
+- 5000 x 5000
+- 10000 x 10000
+- 50000 x 50000
+
+#### BSP Results
+
+- 1000 x 1000: <1ms
+- 5000 x 5000: 5ms
+- 10000 x 10000: 12ms
+- 50000 x 50000: 857ms
+
+It can be seen that BSP performs quite nicely.
+
 ## Methodology
 
 ### Unit tests

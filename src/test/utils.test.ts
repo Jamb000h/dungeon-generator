@@ -1,5 +1,6 @@
 import { Direction } from "../enums/Direction";
 import { MapPoint } from "../enums/MapPoint";
+import BSP from "../other/BSP";
 import {
   calculateDoorLimits,
   generateMap,
@@ -7,6 +8,9 @@ import {
   getRandomBetween,
   getValidDoorDirections,
   generateGrid,
+  generateRooms,
+  generateDoors,
+  generateDungeon,
 } from "../other/utils";
 
 describe("getRandomBetween", () => {
@@ -255,5 +259,75 @@ describe("generateGrid", () => {
     expect(map[2][2]).toEqual(MapPoint.GRID);
     expect(map[3][3]).toEqual(MapPoint.EMPTY);
     expect(map[4][4]).toEqual(MapPoint.GRID);
+  });
+});
+
+describe("generateRooms", () => {
+  test("generates a list of rooms", () => {
+    const height = 100;
+    const width = 100;
+    const gridSize = 5;
+    const leafNodes = BSP(width, height, { gridSize }).getLeaves();
+    const map = generateMap(100, 100);
+
+    const { rooms } = generateRooms(leafNodes, map, gridSize);
+    expect(rooms.length).toBeGreaterThan(0);
+  });
+
+  test("does not generate too small rooms", () => {
+    const height = 100;
+    const width = 100;
+    const gridSize = 5;
+    const leafNodes = BSP(width, height, { gridSize }).getLeaves();
+    const map = generateMap(100, 100);
+
+    const { rooms } = generateRooms(leafNodes, map, gridSize);
+
+    for (let i = 0; i < rooms.length; i++) {
+      const roomArea = rooms[i].height * rooms[i].width;
+      expect(roomArea).toBeGreaterThanOrEqual(gridSize * gridSize);
+      expect(rooms[i].height).toBeGreaterThanOrEqual(gridSize);
+      expect(rooms[i].width).toBeGreaterThanOrEqual(gridSize);
+    }
+  });
+});
+
+describe("generateDoors", () => {
+  test("generates doors for all rooms", () => {
+    const height = 100;
+    const width = 100;
+    const gridSize = 5;
+    const leafNodes = BSP(width, height, { gridSize }).getLeaves();
+    const map = generateMap(100, 100);
+
+    const { rooms } = generateRooms(leafNodes, map, gridSize);
+
+    const { doors } = generateDoors(map, rooms, gridSize);
+
+    expect(doors.length).toEqual(rooms.length);
+  });
+});
+
+describe("generateDungeon", () => {
+  test("throws error message for too small width", () => {
+    expect(() => generateDungeon(50, 200, 200)).toThrow("minimum width is 100");
+  });
+
+  test("throws error message for too small height", () => {
+    expect(() => generateDungeon(200, 50, 200)).toThrow(
+      "minimum height is 100"
+    );
+  });
+
+  test("throws error message for too large gridSize", () => {
+    expect(() => generateDungeon(200, 200, 200)).toThrow("grid size too large");
+  });
+
+  test("generates a valid dungeon", () => {
+    const dungeon = generateDungeon(200, 200, 20);
+
+    expect(dungeon.bspTree.getLeaves().length).toBeGreaterThan(0);
+    expect(dungeon.doors.length).toBeGreaterThan(0);
+    expect(dungeon.routes.length).toBeGreaterThan(0);
   });
 });
