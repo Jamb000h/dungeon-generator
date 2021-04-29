@@ -1,6 +1,6 @@
 import { Direction } from "../enums/Direction";
 import { MapPoint } from "../enums/MapPoint";
-import BSP from "../other/BSP";
+import { BSP } from "../other/BSP";
 import {
   calculateDoorLimits,
   generateMap,

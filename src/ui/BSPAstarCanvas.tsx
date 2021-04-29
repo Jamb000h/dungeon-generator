@@ -19,7 +19,7 @@ interface Props {
   showDoors: boolean;
 }
 
-const Canvas = (props: Props) => {
+export const BSPAstarCanvas = (props: Props) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -104,5 +104,3 @@ const Canvas = (props: Props) => {
     <canvas ref={canvasRef} width={props.mapWidth} height={props.mapHeight} />
   );
 };
-
-export default Canvas;

@@ -1,4 +1,4 @@
-import BSP from "../other/BSP";
+import { BSP } from "../other/BSP";
 import { generateDungeon } from "../other/utils";
 
 describe("BSP performance tests", () => {

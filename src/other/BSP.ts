@@ -1,4 +1,4 @@
-import BSPTree from "../data-structures/BSPTree";
+import { BSPTree } from "../data-structures/BSPTree";
 import { BSPNode } from "../data-structures/BSPNode";
 import { getRandomBetween } from "./utils";
 import { SplitDirection } from "../enums/SplitDirection";
@@ -21,7 +21,11 @@ const defaultOptions: DefaultOptions = {
  * @param height Height of the area to run BSP on
  * @return {BSPTree} a BSP tree
  */
-const BSP = (width: number, height: number, options: Options): BSPTree => {
+export const BSP = (
+  width: number,
+  height: number,
+  options: Options
+): BSPTree => {
   // Handle default options and given options
   const opts = { ...defaultOptions, ...options };
 

@@ -14,7 +14,7 @@ interface Props {
   showDoors: boolean;
 }
 
-export const BellsAndWhistles = (props: Props) => {
+export const BSPAstarSettings = (props: Props) => {
   const [updatedMapWidth, setUpdatedMapWidth] = useState(1000);
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
   const [updatedGridSize, setUpdatedGridSize] = useState(40);

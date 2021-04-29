@@ -1,6 +1,6 @@
 import { BSPNode } from "./BSPNode";
 
-class BSPTree {
+export class BSPTree {
   private root: BSPNode;
 
   constructor(width: number, height: number) {

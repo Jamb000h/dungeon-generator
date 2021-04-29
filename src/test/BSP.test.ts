@@ -1,4 +1,4 @@
-import BSP from "../other/BSP";
+import { BSP } from "../other/BSP";
 import { canFitARoom, isTooDisproportionate } from "../other/utils";
 
 describe("BSP", () => {

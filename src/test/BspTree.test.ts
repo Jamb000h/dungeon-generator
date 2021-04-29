@@ -1,5 +1,5 @@
 import { BSPNode } from "../data-structures/BSPNode";
-import BSPTree from "../data-structures/BSPTree";
+import { BSPTree } from "../data-structures/BSPTree";
 
 describe("BSPTree", () => {
   test("can be initialized with proper values", () => {

@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Canvas from "./Canvas";
-import BSPTree from "../data-structures/BSPTree";
+import { BSPAstarCanvas } from "./BSPAstarCanvas";
+import { BSPTree } from "../data-structures/BSPTree";
 import { Point } from "../interfaces/Point";
 import { generateDungeon } from "../other/utils";
 import { MapPoint } from "../enums/MapPoint";
-import { BellsAndWhistles } from "./BellsAndWhistles";
+import { BSPAstarSettings } from "./BSPAstarSettings";
 import { Log } from "./Log";
+import { CellularSettings } from "./CellularSettings";
+import { CellularCanvas } from "./CellularCanvas";
 
-function App() {
+enum AppToShow {
+  CELLULAR = "CELLULAR",
+  BSPASTAR = "BSPASTAR",
+}
+
+export const App = () => {
   const [bspTree, setBSPTree] = useState<BSPTree | null>(null);
   const [mapWidth, setMapWidth] = useState(1000);
   const [mapHeight, setMapHeight] = useState(500);
@@ -20,16 +27,22 @@ function App() {
   const [showRoutes, setShowRoutes] = useState(true);
   const [showRooms, setShowRooms] = useState(true);
   const [showDoors, setShowDoors] = useState(true);
-  const [message, setMessage] = useState("");
+  const [bspAstarMessage, setBspAstarMessage] = useState("");
+  const [cellularMessage, setCellularMessage] = useState("");
+  const [appToShow, setAppToShow] = useState<AppToShow>(AppToShow.BSPASTAR);
 
-  const generate = (width: number, height: number, gridSize: number) => {
+  const generateBSPAstar = (
+    width: number,
+    height: number,
+    gridSize: number
+  ) => {
     try {
       const startTime = Date.now();
       const dungeon = generateDungeon(width, height, gridSize);
       const duration = Date.now() - startTime;
 
       // Set UI state
-      setMessage("generated dungeon in " + duration + "ms");
+      setBspAstarMessage("generated dungeon in " + duration + "ms");
       setDoors(dungeon.doors);
       setRoutes(dungeon.routes);
       setMapWidth(width);
@@ -37,50 +50,70 @@ function App() {
       setBSPTree(dungeon.bspTree);
       setMap(dungeon.map);
     } catch (e) {
-      setMessage(e.message);
+      setBspAstarMessage(e.message);
       return;
     }
   };
 
   useEffect(() => {
     // When loading UI, generate a dungeong
-    generate(1000, 500, 40);
+    generateBSPAstar(1000, 500, 40);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="app">
-      <BellsAndWhistles
-        generate={generate}
-        setShowLeafBoundaries={setShowLeafBoundaries}
-        setShowGrid={setShowGrid}
-        setShowRoutes={setShowRoutes}
-        setShowRooms={setShowRooms}
-        setShowDoors={setShowDoors}
-        showLeafBoundaries={showLeafBoundaries}
-        showGrid={showGrid}
-        showRoutes={showRoutes}
-        showRooms={showRooms}
-        showDoors={showDoors}
-      />
+    <div className="app-wrapper">
+      <h1>Dungeon Generation</h1>
+      <nav>
+        <button onClick={() => setAppToShow(AppToShow.BSPASTAR)}>
+          BSP-Astar
+        </button>
+        <button onClick={() => setAppToShow(AppToShow.CELLULAR)}>
+          Cellular
+        </button>
+      </nav>
+      {appToShow === AppToShow.BSPASTAR && (
+        <div className="app" id="bsp-astar">
+          <h2>BSP-AStar</h2>
+          <BSPAstarSettings
+            generate={generateBSPAstar}
+            setShowLeafBoundaries={setShowLeafBoundaries}
+            setShowGrid={setShowGrid}
+            setShowRoutes={setShowRoutes}
+            setShowRooms={setShowRooms}
+            setShowDoors={setShowDoors}
+            showLeafBoundaries={showLeafBoundaries}
+            showGrid={showGrid}
+            showRoutes={showRoutes}
+            showRooms={showRooms}
+            showDoors={showDoors}
+          />
 
-      <Log message={message} />
+          <Log message={bspAstarMessage} />
 
-      <Canvas
-        mapWidth={mapWidth}
-        mapHeight={mapHeight}
-        showLeafBoundaries={showLeafBoundaries}
-        leaves={bspTree?.getLeaves()}
-        routes={routes}
-        doors={doors}
-        map={map}
-        showGrid={showGrid}
-        showRoutes={showRoutes}
-        showRooms={showRooms}
-        showDoors={showDoors}
-      />
+          <BSPAstarCanvas
+            mapWidth={mapWidth}
+            mapHeight={mapHeight}
+            showLeafBoundaries={showLeafBoundaries}
+            leaves={bspTree?.getLeaves()}
+            routes={routes}
+            doors={doors}
+            map={map}
+            showGrid={showGrid}
+            showRoutes={showRoutes}
+            showRooms={showRooms}
+            showDoors={showDoors}
+          />
+        </div>
+      )}
+      {appToShow === AppToShow.CELLULAR && (
+        <div className="app" id="cellular">
+          <h2>Cellular</h2>
+          <CellularSettings />
+          <Log message={cellularMessage} />
+          <CellularCanvas mapWidth={mapWidth} mapHeight={mapHeight} />
+        </div>
+      )}
     </div>
   );
-}
-
-export default App;
+};

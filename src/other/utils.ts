@@ -4,7 +4,7 @@ import { MapPoint } from "../enums/MapPoint";
 import { Direction } from "../enums/Direction";
 import { RoomDoors } from "../interfaces/RoomDoors";
 import { getRoutes } from "../pathfinding/aStar";
-import BSP from "./BSP";
+import { BSP } from "./BSP";
 import { Dungeon } from "../enums/Dungeon";
 
 /**

@@ -4,13 +4,13 @@ This project contains unit tests for data structures, algorithms and utility fun
 
 ## Unit test coverage
 
-It can be seen that all custom data structures have been covered with unit tests quite well. For the "other" category BSP algorithm has been tested thoroughly, but utility functions (which are a fairly large part of the dungeon generation) still needs more tests. Pathfinding has not been tested at all via unit tests, which needs to be corrected - currently all testing for pathfinding has been exploratory.
+All current code has 100% test coverage.
 
 ```
 -------------------|---------|----------|---------|---------|-------------------
 File               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
 -------------------|---------|----------|---------|---------|-------------------
-All files          |   99.26 |    99.06 |     100 |    99.6 |
+All files          |     100 |      100 |     100 |     100 |
  data-structures   |     100 |      100 |     100 |     100 |
   BSPNode.ts       |     100 |      100 |     100 |     100 |
   BSPTree.ts       |     100 |      100 |     100 |     100 |
@@ -18,8 +18,9 @@ All files          |   99.26 |    99.06 |     100 |    99.6 |
  other             |     100 |      100 |     100 |     100 |
   BSP.ts           |     100 |      100 |     100 |     100 |
   utils.ts         |     100 |      100 |     100 |     100 |
- pathfinding       |   96.83 |       96 |     100 |   98.33 |
-  aStar.ts         |   96.83 |       96 |     100 |   98.33 | 93
+ pathfinding       |     100 |      100 |     100 |     100 |
+  aStar.ts         |     100 |      100 |     100 |     100 |
+-------------------|---------|----------|---------|---------|-------------------
 ```
 
 ## Performance testing
