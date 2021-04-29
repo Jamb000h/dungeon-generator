@@ -18,7 +18,11 @@ export const getRoutes = (map: MapPoint[][], doors: RoomDoors[]) => {
  * @param map map for traversal
  * @return {array} route
  */
-const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
+export const aStar = (
+  start: Point,
+  finish: Point,
+  map: MapPoint[][]
+): Point[] => {
   // Initialize bookkeeping variables
   const visited: { [key: string]: boolean } = {};
   const distances: { [key: string]: number } = {};
@@ -36,18 +40,14 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
     // Get the desired value and parse a key to use with bookkeeping
     const current = queue.pop();
     const key = `${current.y}-${current.x}`;
+    if (visited[key]) continue;
+    visited[key] = true;
 
     // If we reached finish node, calculate and return route
     if (current.x === finish.x && current.y === finish.y) {
       const fastestRoute = route(key, parents);
       return fastestRoute;
     }
-
-    // Skip if visited already
-    if (visited[key]) continue;
-
-    // Process node if not visited
-    visited[key] = true;
 
     // Get valid directions
     const validNeighbors = getValidNeighbors(current.x, current.y, map);
@@ -61,7 +61,7 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
       // Parse a key for bookkeeping
       const directionKey = `${neighborY}-${neighborX}`;
 
-      // Get current distance for bookkeeping or assume Infinity
+      // Get current distance from bookkeeping or assume Infinity
       const directionDistance =
         distances[directionKey] !== undefined
           ? distances[directionKey]
@@ -73,8 +73,8 @@ const aStar = (start: Point, finish: Point, map: MapPoint[][]): Point[] => {
       const heuristic = manhattan({ y: neighborY, x: neighborX }, finish);
 
       // If new distance is faster, update bookkeeping
-      if (newDirectionDistance < directionDistance) {
-        distances[directionKey] = current.priority + 1;
+      if (!visited[directionKey] || newDirectionDistance < directionDistance) {
+        distances[directionKey] = newDirectionDistance;
         parents[directionKey] = key;
         queue.push(neighborX, neighborY, newDirectionDistance + heuristic);
       }

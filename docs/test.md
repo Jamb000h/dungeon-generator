@@ -28,11 +28,11 @@ All files          |   99.26 |    99.06 |     100 |    99.6 |
 
 There are performance tests testing the following scenarios:
 
-- A 1000 x 1000 dungeon generated 5 times with a minimum room size of 10000 and a pathfinding grid size of 20
-- A 1920 x 1080 (typical full screen) dungeon generated 5 times with a minimum room size of 10000 and a pathfinding grid size of 20
-- A 1000 x h dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - h increases in increments of 100 and starts at 1000
-- A w x 1000 dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - w increases in increments of 100 and starts at 1000
-- A w x h dungeon generated n times with a minimum room size of 10000 and a pathfinding grid size of 20 until generation time exceeds 5 seconds - both w and h increase in increments of 100 and start at 1000
+- A 1000 x 1000 dungeon generated 5 times with a pathfinding grid size of 20
+- A 1920 x 1080 (typical full screen) dungeon generated 5 times with a pathfinding grid size of 20
+- A 1000 x h dungeon generated n times with a pathfinding grid size of 20 until generation time exceeds 5 seconds - h increases in increments of 100 and starts at 1000
+- A w x 1000 dungeon generated n times with a pathfinding grid size of 20 until generation time exceeds 5 seconds - w increases in increments of 100 and starts at 1000
+- A w x h dungeon generated n times with a pathfinding grid size of 20 until generation time exceeds 5 seconds - both w and h increase in increments of 100 and start at 1000
 
 #### Performance testing results for complete dungeon generation (Averages after 3 runs)
 
