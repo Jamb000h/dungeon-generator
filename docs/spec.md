@@ -65,3 +65,5 @@ Map size is given as two integers x and y, which represent the map width and hei
 [5] Heaps and Priority Queues. Hackerearth. https://www.hackerearth.com/practice/notes/heaps-and-priority-queues/
 
 [6] Binary Heaps and Priority Queues via JavaScript. DigitalOcean. https://www.digitalocean.com/community/tutorials/js-binary-heaps
+
+[7] Constructive Generation Methods for Dungeons. Marco Niemann. https://www.wi.uni-muenster.de/sites/wi/files/users/mpreu_02/games-material/ba-vm-ss2015/marco_niemann_-_constructive_generation_methods_for_dungeons_-_thesis.pdf

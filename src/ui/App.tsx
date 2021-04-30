@@ -9,6 +9,7 @@ import { BSPAstarSettings } from "./BSPAstarSettings";
 import { Log } from "./Log";
 import { CellularSettings } from "./CellularSettings";
 import { CellularCanvas } from "./CellularCanvas";
+import { CellularMapPoint, gcd, iterate } from "../other/CellularAutomaton";
 
 enum AppToShow {
   CELLULAR = "CELLULAR",
@@ -16,6 +17,8 @@ enum AppToShow {
 }
 
 export const App = () => {
+  const [appToShow, setAppToShow] = useState<AppToShow>(AppToShow.BSPASTAR);
+  // UI state for BSP + AStar
   const [bspTree, setBSPTree] = useState<BSPTree | null>(null);
   const [mapWidth, setMapWidth] = useState(1000);
   const [mapHeight, setMapHeight] = useState(500);
@@ -28,8 +31,14 @@ export const App = () => {
   const [showRooms, setShowRooms] = useState(true);
   const [showDoors, setShowDoors] = useState(true);
   const [bspAstarMessage, setBspAstarMessage] = useState("");
+  // UI state for cellular generation
+  const [initialRoomRatio, setInitialRoomRatio] = useState(0.5);
+  const [turnToRoomThreshold, setTurnToRoomThreshold] = useState(5);
+  const [turnToWallThreshold, setTurnToWallThreshold] = useState(5);
+  const [cellularMap, setCellularMap] = useState<CellularMapPoint[][]>([]);
+  const [cellularMapWidth, setCellularMapWidth] = useState(1000);
+  const [cellularMapHeight, setCellularMepHeight] = useState(500);
   const [cellularMessage, setCellularMessage] = useState("");
-  const [appToShow, setAppToShow] = useState<AppToShow>(AppToShow.BSPASTAR);
 
   const generateBSPAstar = (
     width: number,
@@ -57,9 +66,28 @@ export const App = () => {
 
   useEffect(() => {
     // When loading UI, generate a dungeong
-    generateBSPAstar(1000, 500, 40);
+    generateBSPAstar(mapWidth, mapHeight, 20);
+    gcd(cellularMapHeight, cellularMapWidth, initialRoomRatio);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const iterateCellular = () => {
+    const startTime = Date.now();
+    const map = iterate(cellularMap, turnToRoomThreshold, turnToWallThreshold);
+    const duration = Date.now() - startTime;
+    setCellularMessage("iterated in " + duration + "ms");
+    setCellularMap(map);
+  };
+
+  const initializeCellular = (height: number, width: number) => {
+    const startTime = Date.now();
+    const map = gcd(cellularMapHeight, cellularMapWidth, initialRoomRatio);
+    const duration = Date.now() - startTime;
+    setCellularMessage("initialized in " + duration + "ms");
+    setCellularMap(map);
+    setCellularMepHeight(height);
+    setCellularMapWidth(width);
+  };
 
   return (
     <div className="app-wrapper">
@@ -109,9 +137,22 @@ export const App = () => {
       {appToShow === AppToShow.CELLULAR && (
         <div className="app" id="cellular">
           <h2>Cellular</h2>
-          <CellularSettings />
+          <CellularSettings
+            initialRoomRatio={initialRoomRatio}
+            turnToWallThreshold={turnToWallThreshold}
+            turnToRoomThreshold={turnToRoomThreshold}
+            setInitialRoomRatio={setInitialRoomRatio}
+            setTurnToWallThreshold={setTurnToWallThreshold}
+            setTurnToRoomThreshold={setTurnToRoomThreshold}
+            iterate={iterateCellular}
+            initialize={initializeCellular}
+          />
           <Log message={cellularMessage} />
-          <CellularCanvas mapWidth={mapWidth} mapHeight={mapHeight} />
+          <CellularCanvas
+            mapWidth={cellularMapWidth}
+            mapHeight={cellularMapHeight}
+            map={cellularMap}
+          />
         </div>
       )}
     </div>

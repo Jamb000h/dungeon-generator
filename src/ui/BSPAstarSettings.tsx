@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Props {
   generate: (width: number, height: number, gridSize: number) => void;
@@ -18,6 +18,10 @@ export const BSPAstarSettings = (props: Props) => {
   const [updatedMapWidth, setUpdatedMapWidth] = useState(1000);
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
   const [updatedGridSize, setUpdatedGridSize] = useState(40);
+
+  useEffect(() => {
+    props.generate(1000, 500, 40);
+  }, []);
 
   return (
     <div className="settings">
