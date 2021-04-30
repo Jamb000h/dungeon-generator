@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { CellularMapPoint } from "../other/CellularAutomaton";
+import { CellularMapPoint } from "../other/Cellular";
 import "./Canvas.css";
 
 interface Props {
@@ -15,7 +15,7 @@ export const CellularCanvas = (props: Props) => {
   useEffect(() => {
     const context = canvasRef.current?.getContext("2d");
     context?.resetTransform();
-    context?.scale(2, 2);
+    context?.scale(4, 4);
   }, [props.mapHeight, props.mapWidth]);
 
   useEffect(() => {

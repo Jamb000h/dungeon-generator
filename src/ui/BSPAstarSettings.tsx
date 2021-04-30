@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   generate: (width: number, height: number, gridSize: number) => void;
@@ -19,10 +19,6 @@ export const BSPAstarSettings = (props: Props) => {
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
   const [updatedGridSize, setUpdatedGridSize] = useState(40);
 
-  useEffect(() => {
-    props.generate(1000, 500, 40);
-  }, []);
-
   return (
     <div className="settings">
       <label htmlFor="width">
@@ -30,7 +26,7 @@ export const BSPAstarSettings = (props: Props) => {
         <input
           id="width"
           value={updatedMapWidth}
-          onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) || 0)}
+          onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) ?? 0)}
         />
       </label>
       <label htmlFor="height">
@@ -38,7 +34,7 @@ export const BSPAstarSettings = (props: Props) => {
         <input
           id="height"
           value={updatedMapHeight}
-          onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) || 0)}
+          onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) ?? 0)}
         />
       </label>
       <label htmlFor="gridSize">
@@ -46,7 +42,7 @@ export const BSPAstarSettings = (props: Props) => {
         <input
           id="gridSize"
           value={updatedGridSize}
-          onChange={(e) => setUpdatedGridSize(parseInt(e.target.value) || 0)}
+          onChange={(e) => setUpdatedGridSize(parseInt(e.target.value) ?? 0)}
         />
       </label>
       <label htmlFor="showLeafBoundaries">

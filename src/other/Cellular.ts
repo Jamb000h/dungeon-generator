@@ -1,45 +1,13 @@
-import { MapPoint } from "../enums/MapPoint";
-import { RoomDoors } from "../interfaces/RoomDoors";
-import BSP from "./BSP";
-import { generateDoors, generateMap, generateRooms } from "./utils";
-
 export enum CellularMapPoint {
   ROOM = "ROOM",
   WALL = "WALL",
 }
 
-export const generateCellularDungeon = (height: number, width: number) => {
-  // Run BSP to split area
-  const bspTree = BSP(width, height, {
-    gridSize: 30,
-  });
-  const map = generateMap(height, width);
-  // Generate rooms from the bspTree leaf nodes and store in state
-  const { rooms, map: mapWithRooms } = generateRooms(
-    bspTree.getLeaves(),
-    map,
-    30
-  );
-
-  // Generate doors for rooms
-  const { doors, map: mapWithDoors } = generateDoors(mapWithRooms, rooms, 30);
-
-  const connections = generateConnections(mapWithDoors, doors);
-  return { map: mapWithDoors, connections };
-};
-
-export const generateConnections = (
-  mapWidthDoors: MapPoint[][],
-  doors: RoomDoors[]
+export const generateCellularDungeon = (
+  height: number,
+  width: number,
+  roomRatio: number
 ) => {
-  const connections = [];
-  for (let i = 0; i < doors.length - 1; i++) {
-    connections.push({ start: doors[i].inDoor, end: doors[i + 1].outDoor });
-  }
-  return connections;
-};
-
-export const gcd = (height: number, width: number, roomRatio: number) => {
   let map: CellularMapPoint[][] = [];
   for (let y = 0; y < height; y++) {
     map.push([]);
@@ -53,7 +21,7 @@ export const gcd = (height: number, width: number, roomRatio: number) => {
   return map;
 };
 
-export const iterate = (
+export const iterateCellularDungeon = (
   map: CellularMapPoint[][],
   turnToRoomThreshold: number,
   turnToWallThreshold: number
@@ -97,6 +65,8 @@ export const getNeighborTypeCounts = (
       xx <= Math.min(map[yy].length - 1, x + 1);
       xx++
     ) {
+      if (yy === y && xx === x) continue;
+
       types[map[yy][xx]] = types[map[yy][xx]] + 1;
     }
   }

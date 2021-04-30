@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./App.css";
 import { BSPAstarCanvas } from "./BSPAstarCanvas";
 import { BSPTree } from "../data-structures/BSPTree";
@@ -9,7 +9,11 @@ import { BSPAstarSettings } from "./BSPAstarSettings";
 import { Log } from "./Log";
 import { CellularSettings } from "./CellularSettings";
 import { CellularCanvas } from "./CellularCanvas";
-import { CellularMapPoint, gcd, iterate } from "../other/CellularAutomaton";
+import {
+  CellularMapPoint,
+  generateCellularDungeon,
+  iterateCellularDungeon,
+} from "../other/Cellular";
 
 enum AppToShow {
   CELLULAR = "CELLULAR",
@@ -33,7 +37,8 @@ export const App = () => {
   const [bspAstarMessage, setBspAstarMessage] = useState("");
   // UI state for cellular generation
   const [initialRoomRatio, setInitialRoomRatio] = useState(0.5);
-  const [turnToRoomThreshold, setTurnToRoomThreshold] = useState(5);
+  const [initialIterations, setInitialIterations] = useState(5);
+  const [turnToRoomThreshold, setTurnToRoomThreshold] = useState(3);
   const [turnToWallThreshold, setTurnToWallThreshold] = useState(5);
   const [cellularMap, setCellularMap] = useState<CellularMapPoint[][]>([]);
   const [cellularMapWidth, setCellularMapWidth] = useState(1000);
@@ -64,29 +69,37 @@ export const App = () => {
     }
   };
 
-  useEffect(() => {
-    // When loading UI, generate a dungeong
-    generateBSPAstar(mapWidth, mapHeight, 20);
-    gcd(cellularMapHeight, cellularMapWidth, initialRoomRatio);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const iterateCellular = () => {
-    const startTime = Date.now();
-    const map = iterate(cellularMap, turnToRoomThreshold, turnToWallThreshold);
-    const duration = Date.now() - startTime;
-    setCellularMessage("iterated in " + duration + "ms");
-    setCellularMap(map);
-  };
-
   const initializeCellular = (height: number, width: number) => {
     const startTime = Date.now();
-    const map = gcd(cellularMapHeight, cellularMapWidth, initialRoomRatio);
+    let map = generateCellularDungeon(
+      Math.floor(cellularMapHeight / 4),
+      Math.floor(cellularMapWidth / 4),
+      initialRoomRatio
+    );
+    for (let i = 0; i < initialIterations; i++) {
+      map = iterateCellularDungeon(
+        map,
+        turnToRoomThreshold,
+        turnToWallThreshold
+      );
+    }
     const duration = Date.now() - startTime;
     setCellularMessage("initialized in " + duration + "ms");
     setCellularMap(map);
     setCellularMepHeight(height);
     setCellularMapWidth(width);
+  };
+
+  const iterateCellular = () => {
+    const startTime = Date.now();
+    const map = iterateCellularDungeon(
+      cellularMap,
+      turnToRoomThreshold,
+      turnToWallThreshold
+    );
+    const duration = Date.now() - startTime;
+    setCellularMessage("iterated in " + duration + "ms");
+    setCellularMap(map);
   };
 
   return (
@@ -141,9 +154,11 @@ export const App = () => {
             initialRoomRatio={initialRoomRatio}
             turnToWallThreshold={turnToWallThreshold}
             turnToRoomThreshold={turnToRoomThreshold}
+            initialIterations={initialIterations}
             setInitialRoomRatio={setInitialRoomRatio}
             setTurnToWallThreshold={setTurnToWallThreshold}
             setTurnToRoomThreshold={setTurnToRoomThreshold}
+            setInitialIterations={setInitialIterations}
             iterate={iterateCellular}
             initialize={initializeCellular}
           />

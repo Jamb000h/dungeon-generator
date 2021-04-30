@@ -62,19 +62,19 @@ export const BSPAstarCanvas = (props: Props) => {
 
         if (i > 0) {
           context.fillRect(
-            props.doors[i].inDoor.x - 1,
-            props.doors[i].inDoor.y - 1,
-            3,
-            3
+            props.doors[i].inDoor.x - 2,
+            props.doors[i].inDoor.y - 2,
+            5,
+            5
           );
         }
 
         if (i < props.doors.length - 1) {
           context.fillRect(
-            props.doors[i].outDoor.x - 1,
-            props.doors[i].outDoor.y - 1,
-            3,
-            3
+            props.doors[i].outDoor.x - 2,
+            props.doors[i].outDoor.y - 2,
+            5,
+            5
           );
         }
       }

@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface Props {
   initialRoomRatio: number;
   turnToRoomThreshold: number;
   turnToWallThreshold: number;
+  initialIterations: number;
   setInitialRoomRatio: (ratio: number) => void;
-  setTurnToRoomThreshold: (ratio: number) => void;
-  setTurnToWallThreshold: (ratio: number) => void;
+  setTurnToRoomThreshold: (threshold: number) => void;
+  setTurnToWallThreshold: (threshold: number) => void;
+  setInitialIterations: (iterations: number) => void;
   initialize: (height: number, width: number) => void;
   iterate: () => void;
 }
@@ -16,18 +18,16 @@ export const CellularSettings = (props: Props) => {
     initialRoomRatio,
     turnToRoomThreshold,
     turnToWallThreshold,
+    initialIterations,
     setInitialRoomRatio,
     setTurnToRoomThreshold,
     setTurnToWallThreshold,
+    setInitialIterations,
     initialize,
     iterate,
   } = props;
   const [updatedMapWidth, setUpdatedMapWidth] = useState(1000);
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
-
-  useEffect(() => {
-    props.initialize(updatedMapHeight, updatedMapWidth);
-  }, []);
 
   return (
     <div className="settings">
@@ -36,7 +36,7 @@ export const CellularSettings = (props: Props) => {
         <input
           id="width"
           value={updatedMapWidth}
-          onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) || 0)}
+          onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) ?? 0)}
         />
       </label>
       <label htmlFor="height">
@@ -44,7 +44,15 @@ export const CellularSettings = (props: Props) => {
         <input
           id="height"
           value={updatedMapHeight}
-          onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) || 0)}
+          onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) ?? 0)}
+        />
+      </label>
+      <label htmlFor="initialIterations">
+        initial iterations to run
+        <input
+          id="initialIterations"
+          value={initialIterations}
+          onChange={(e) => setInitialIterations(parseInt(e.target.value) ?? 5)}
         />
       </label>
       <label htmlFor="initialRoomRatio">
@@ -53,7 +61,7 @@ export const CellularSettings = (props: Props) => {
           id="initialRoomRatio"
           value={initialRoomRatio}
           onChange={(e) =>
-            setInitialRoomRatio(parseFloat(e.target.value) || 0.5)
+            setInitialRoomRatio(parseFloat(e.target.value) ?? 0.5)
           }
         />
       </label>
@@ -63,7 +71,7 @@ export const CellularSettings = (props: Props) => {
           id="turnToRoomThreshold"
           value={turnToRoomThreshold}
           onChange={(e) =>
-            setTurnToRoomThreshold(parseInt(e.target.value) || 5)
+            setTurnToRoomThreshold(parseInt(e.target.value) ?? 5)
           }
         />
       </label>
@@ -73,7 +81,7 @@ export const CellularSettings = (props: Props) => {
           id="turnToWallThreshold"
           value={turnToWallThreshold}
           onChange={(e) =>
-            setTurnToWallThreshold(parseInt(e.target.value) || 5)
+            setTurnToWallThreshold(parseInt(e.target.value) ?? 5)
           }
         />
       </label>
