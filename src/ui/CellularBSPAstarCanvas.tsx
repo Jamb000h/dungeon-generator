@@ -8,15 +8,9 @@ interface Props {
   map: CellularMapPoint[][];
 }
 
-export const CellularCanvas = (props: Props) => {
+export const CellularBSPAstarCanvas = (props: Props) => {
   const { mapWidth, mapHeight, map } = props;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  useEffect(() => {
-    const context = canvasRef.current?.getContext("2d");
-    context?.resetTransform();
-    context?.scale(2, 2);
-  }, [props.mapHeight, props.mapWidth]);
 
   useEffect(() => {
     const context = canvasRef.current?.getContext("2d");
@@ -27,7 +21,7 @@ export const CellularCanvas = (props: Props) => {
       context.fillStyle = "#fff";
       for (let y = 0; y < map.length; y++) {
         for (let x = 0; x < map[y].length; x++) {
-          if (map[y][x] === CellularMapPoint.ROOM) {
+          if (map[y][x] !== CellularMapPoint.WALL) {
             context.fillRect(x, y, 1, 1);
           }
         }

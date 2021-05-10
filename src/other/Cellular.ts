@@ -1,6 +1,9 @@
+import { MapPoint } from "../enums/MapPoint";
+
 export enum CellularMapPoint {
   ROOM = "ROOM",
   WALL = "WALL",
+  LOCKEDROOM = "LOCKEDROOM",
 }
 
 export const generateCellularDungeon = (
@@ -32,7 +35,10 @@ export const iterateCellularDungeon = (
     newMap.push([]);
     for (let x = 0; x < map[y].length; x++) {
       const types = getNeighborTypeCounts(x, y, map);
-      if (types[CellularMapPoint.ROOM] >= turnToRoomThreshold) {
+      if (
+        types[CellularMapPoint.ROOM] + types[CellularMapPoint.LOCKEDROOM] >=
+        turnToRoomThreshold
+      ) {
         newMap[y][x] = CellularMapPoint.ROOM;
       }
 
@@ -53,6 +59,7 @@ export const getNeighborTypeCounts = (
   const types = {
     [CellularMapPoint.ROOM]: 0,
     [CellularMapPoint.WALL]: 0,
+    [CellularMapPoint.LOCKEDROOM]: 0,
   };
 
   for (
@@ -71,4 +78,60 @@ export const getNeighborTypeCounts = (
     }
   }
   return types;
+};
+
+export const generateCellularDungeonFromBSPAStar = (
+  map: MapPoint[][],
+  roomRatio: number
+) => {
+  let newMap: CellularMapPoint[][] = [];
+  for (let y = 0; y < map.length; y++) {
+    newMap.push([]);
+    for (let x = 0; x < map[y].length; x++) {
+      if ([MapPoint.DOOR, MapPoint.ROOM, MapPoint.ROAD].includes(map[y][x])) {
+        newMap[y].push(CellularMapPoint.LOCKEDROOM);
+        continue;
+      }
+      if (map[y][x] === MapPoint.ROOM) {
+        newMap[y].push(CellularMapPoint.ROOM);
+        continue;
+      }
+      Math.random() < roomRatio
+        ? newMap[y].push(CellularMapPoint.ROOM)
+        : newMap[y].push(CellularMapPoint.WALL);
+    }
+  }
+
+  return newMap;
+};
+
+export const iterateCellularDungeonFromBSPAStar = (
+  map: CellularMapPoint[][],
+  turnToRoomThreshold: number,
+  turnToWallThreshold: number
+): CellularMapPoint[][] => {
+  const newMap: CellularMapPoint[][] = [];
+
+  for (let y = 0; y < map.length; y++) {
+    newMap.push([]);
+    for (let x = 0; x < map[y].length; x++) {
+      if (map[y][x] === CellularMapPoint.LOCKEDROOM) {
+        newMap[y][x] = CellularMapPoint.LOCKEDROOM;
+        continue;
+      }
+      const types = getNeighborTypeCounts(x, y, map);
+      if (
+        types[CellularMapPoint.ROOM] + types[CellularMapPoint.LOCKEDROOM] >=
+        turnToRoomThreshold
+      ) {
+        newMap[y][x] = CellularMapPoint.ROOM;
+      }
+
+      if (types[CellularMapPoint.WALL] >= turnToWallThreshold) {
+        newMap[y][x] = CellularMapPoint.WALL;
+      }
+    }
+  }
+
+  return newMap;
 };
