@@ -1,4 +1,5 @@
 import { MapPoint } from "../enums/MapPoint";
+import { Point } from "../interfaces/Point";
 
 export enum CellularMapPoint {
   ROOM = "ROOM",
@@ -134,4 +135,52 @@ export const iterateCellularDungeonFromBSPAStar = (
   }
 
   return newMap;
+};
+
+export const cleanup = (map: CellularMapPoint[][], start: Point) => {
+  const stack: Point[] = [];
+  const valid: Point[] = [];
+  const visited: { [key: string]: boolean } = {};
+  stack.push(start);
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!visited[`${node!.x}-${node!.y}`]) {
+      visited[`${node!.x}-${node!.y}`] = true;
+      valid.push(node!);
+      const neighbors = findNeighbors(map, node!);
+      for (let j = 0; j < neighbors.length; j++) {
+        if (map[neighbors[j].y][neighbors[j].x] !== CellularMapPoint.WALL) {
+          stack.push(neighbors[j]);
+        }
+      }
+    }
+  }
+
+  const emptyMap = generateCellularDungeon(map.length, map[0].length, 0);
+
+  for (let i = 0; i < valid.length; i++) {
+    emptyMap[valid[i].y][valid[i].x] = CellularMapPoint.ROOM;
+  }
+
+  return emptyMap;
+};
+
+const findNeighbors = (map: CellularMapPoint[][], point: Point) => {
+  const neighbors = [];
+  for (
+    let y = Math.max(0, point.y - 1);
+    y <= Math.min(map.length - 1, point.y + 1);
+    y++
+  ) {
+    for (
+      let x = Math.max(0, point.x - 1);
+      x <= Math.min(map[y].length - 1, point.x + 1);
+      x++
+    ) {
+      if (y === point.y && x === point.x) continue;
+
+      neighbors.push({ x, y });
+    }
+  }
+  return neighbors;
 };

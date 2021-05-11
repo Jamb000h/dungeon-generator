@@ -11,6 +11,7 @@ import { CellularSettings } from "./CellularSettings";
 import { CellularCanvas } from "./CellularCanvas";
 import {
   CellularMapPoint,
+  cleanup,
   generateCellularDungeon,
   generateCellularDungeonFromBSPAStar,
   iterateCellularDungeon,
@@ -59,6 +60,7 @@ export const App = () => {
   >([]);
   const [bspAstarCellularHeight, setBSPAstarCellularHeight] = useState(500);
   const [bspAstarCellularWidth, setBSPAstarCellularWidth] = useState(1000);
+  const [cleanUpStart, setCleanUpStart] = useState<Point>({ x: 0, y: 0 });
 
   const generateBSPAstar = (
     width: number,
@@ -162,10 +164,15 @@ export const App = () => {
     const mapWithRoutes = addRoutesToMap(initialCellularMap, dungeon.routes);
     const duration = Date.now() - startTime;
     // Set UI state
+    setCleanUpStart(dungeon.routes[0][0]);
     setBSPAstarCellularMap(mapWithRoutes);
     setBspAstarCellularMessage("generated dungeon in " + duration + "ms");
     setBSPAstarCellularHeight(height);
     setBSPAstarCellularWidth(width);
+  };
+
+  const cleanUpBSPAstarCellular = () => {
+    setBSPAstarCellularMap(cleanup(bspAstarCellularMap, cleanUpStart));
   };
 
   return (
@@ -245,6 +252,7 @@ export const App = () => {
           <CellularBSPAstarSettings
             iterate={iterateBSPAstarCellular}
             initialize={initializeBSPAstarCellular}
+            cleanup={cleanUpBSPAstarCellular}
           />
           <Log message={bspAstarCellularMessage} />
           <CellularBSPAstarCanvas

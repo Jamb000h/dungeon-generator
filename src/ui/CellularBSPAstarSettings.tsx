@@ -8,6 +8,7 @@ interface Props {
     roomRatio: number
   ) => void;
   iterate: () => void;
+  cleanup: () => void;
 }
 
 export const CellularBSPAstarSettings = (props: Props) => {
@@ -15,6 +16,8 @@ export const CellularBSPAstarSettings = (props: Props) => {
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
   const [updatedGridSize, setUpdatedGridSize] = useState(40);
   const [updatedRoomRatio, setUpdatedRoomRatio] = useState(0.5);
+  const [initialized, setInitialized] = useState(false);
+  const [cleaned, setCleaned] = useState(false);
 
   return (
     <div className="settings">
@@ -53,18 +56,32 @@ export const CellularBSPAstarSettings = (props: Props) => {
         />
       </label>
       <button
-        onClick={() =>
+        onClick={() => {
+          setInitialized(true);
+          setCleaned(false);
           props.initialize(
             updatedMapHeight,
             updatedMapWidth,
             updatedGridSize,
             updatedRoomRatio
-          )
-        }
+          );
+        }}
       >
         initialize
       </button>
-      <button onClick={() => props.iterate()}>iterate</button>
+      {initialized && !cleaned && (
+        <>
+          <button onClick={() => props.iterate()}>iterate</button>
+          <button
+            onClick={() => {
+              props.cleanup();
+              setCleaned(true);
+            }}
+          >
+            cleanup
+          </button>
+        </>
+      )}
     </div>
   );
 };
