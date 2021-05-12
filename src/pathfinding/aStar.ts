@@ -2,6 +2,7 @@ import { PriorityQueue } from "../data-structures/PriorityQueue";
 import { MapPoint } from "../enums/MapPoint";
 import { Point } from "../interfaces/Point";
 import { RoomDoors } from "../interfaces/RoomDoors";
+import { isInBounds } from "../other/utils";
 
 export const getRoutes = (map: MapPoint[][], doors: RoomDoors[]) => {
   const routes = [];
@@ -46,6 +47,9 @@ export const aStar = (
     // If we reached finish node, calculate and return route
     if (current.x === finish.x && current.y === finish.y) {
       const fastestRoute = route(key, parents);
+      for (let i = 0; i < fastestRoute.length; i++) {
+        map[fastestRoute[i].y][fastestRoute[i].x] = MapPoint.ROAD;
+      }
       return fastestRoute;
     }
 
@@ -107,12 +111,12 @@ const getValidNeighbors = (x: number, y: number, map: MapPoint[][]) => {
 };
 
 const isValidNeighbor = (x: number, y: number, map: MapPoint[][]) => {
-  return (
-    y >= 0 &&
-    y < map.length &&
-    x >= 0 &&
-    x < map[y].length &&
-    [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(map[y][x])
+  return isInBounds(map, { x, y }) && isOnGrid(map, { x, y });
+};
+
+const isOnGrid = (map: MapPoint[][], point: Point) => {
+  return [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(
+    map[point.y][point.x]
   );
 };
 
@@ -121,10 +125,10 @@ const route = (key: string, parents: { [key: string]: string }): Point[] => {
   let currentKey = key;
   while (true) {
     let currentNode = parents[currentKey];
-    route.push({
-      y: parseInt(currentNode.split("-")[0]),
-      x: parseInt(currentNode.split("-")[1]),
-    });
+    const y = parseInt(currentNode.split("-")[0]);
+    const x = parseInt(currentNode.split("-")[1]);
+
+    route.push({ y, x });
 
     currentKey = parents[currentKey];
 

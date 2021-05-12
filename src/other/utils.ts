@@ -6,6 +6,8 @@ import { RoomDoors } from "../interfaces/RoomDoors";
 import { getRoutes } from "../pathfinding/aStar";
 import { BSP } from "./BSP";
 import { Dungeon } from "../enums/Dungeon";
+import { CellularMapPoint } from "./Cellular";
+import { Point } from "../interfaces/Point";
 
 /**
  * Generates rooms given a list of nodes.
@@ -367,10 +369,69 @@ export const generateDungeon = (
   // Generate routes between doors
   const routes = getRoutes(mapWithDoors, doors);
 
+  const pathfindingStart = { x: rooms[0].x, y: rooms[0].y };
+
   return {
     routes,
     doors,
     bspTree,
     map: mapWithDoors,
+    rooms,
+    pathfindingStart,
   };
+};
+
+export const findReachablePoints = (
+  map: CellularMapPoint[][] | MapPoint[][],
+  start: Point
+) => {
+  const stack: Point[] = [];
+  const valid: Point[] = [];
+  const visited: { [key: string]: boolean } = {};
+  stack.push(start);
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!visited[`${node!.x}-${node!.y}`]) {
+      visited[`${node!.x}-${node!.y}`] = true;
+      valid.push(node!);
+      const neighbors = findNeighbors(map, node!);
+      for (let j = 0; j < neighbors.length; j++) {
+        const { x, y } = neighbors[j];
+        if (
+          map[y][x] !== CellularMapPoint.WALL &&
+          map[y][x] !== MapPoint.EMPTY &&
+          map[y][x] !== MapPoint.GRID
+        ) {
+          stack.push(neighbors[j]);
+        }
+      }
+    }
+  }
+
+  return valid;
+};
+
+export const isInBounds = (
+  map: MapPoint[][] | CellularMapPoint[][],
+  point: Point
+) => {
+  const { x, y } = point;
+  return y >= 0 && y < map.length && x >= 0 && x < map[y].length;
+};
+
+export const findNeighbors = (
+  map: MapPoint[][] | CellularMapPoint[][],
+  point: Point
+) => {
+  const neighbors = [];
+  for (let y = point.y - 1; y <= point.y + 1; y++) {
+    for (let x = point.x - 1; x <= point.x + 1; x++) {
+      if (y === point.y && x === point.x) continue;
+
+      if (isInBounds(map, { x, y })) {
+        neighbors.push({ x, y });
+      }
+    }
+  }
+  return neighbors;
 };

@@ -4,5 +4,4 @@ export enum MapPoint {
   ROAD = "ROAD",
   ROOM = "ROOM",
   DOOR = "DOOR",
-  WALL = "WALL",
 }

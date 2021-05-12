@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import "./App.css";
 import { BSPAstarCanvas } from "./BSPAstarCanvas";
-import { BSPTree } from "../data-structures/BSPTree";
 import { Point } from "../interfaces/Point";
 import { generateDungeon } from "../other/utils";
-import { MapPoint } from "../enums/MapPoint";
 import { BSPAstarSettings } from "./BSPAstarSettings";
 import { Log } from "./Log";
 import { CellularSettings } from "./CellularSettings";
 import { CellularCanvas } from "./CellularCanvas";
 import {
+  addRoutesToMap,
   CellularMapPoint,
   cleanup,
   generateCellularDungeon,
@@ -19,6 +18,7 @@ import {
 } from "../other/Cellular";
 import { CellularBSPAstarSettings } from "./CellularBSPAstarSettings";
 import { CellularBSPAstarCanvas } from "./CellularBSPAstarCanvas";
+import { Dungeon } from "../enums/Dungeon";
 
 enum AppToShow {
   CELLULAR = "CELLULAR",
@@ -30,12 +30,9 @@ export const App = () => {
   const [appToShow, setAppToShow] = useState<AppToShow>(AppToShow.BSPASTAR);
 
   // UI state for BSP + AStar
-  const [bspTree, setBSPTree] = useState<BSPTree | null>(null);
+  const [dungeon, setDungeon] = useState<Dungeon | null>(null);
   const [mapWidth, setMapWidth] = useState(1000);
   const [mapHeight, setMapHeight] = useState(500);
-  const [doors, setDoors] = useState<{ inDoor: Point; outDoor: Point }[]>([]);
-  const [routes, setRoutes] = useState<Point[][]>([]);
-  const [map, setMap] = useState<MapPoint[][]>([]);
   const [showLeafBoundaries, setShowLeafBoundaries] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [showRoutes, setShowRoutes] = useState(true);
@@ -59,7 +56,7 @@ export const App = () => {
     CellularMapPoint[][]
   >([]);
   const [bspAstarCellularHeight, setBSPAstarCellularHeight] = useState(500);
-  const [bspAstarCellularWidth, setBSPAstarCellularWidth] = useState(1000);
+  const [bspAstarCellularWidth, setBSPAstarCellularWidth] = useState(500);
   const [cleanUpStart, setCleanUpStart] = useState<Point>({ x: 0, y: 0 });
 
   const generateBSPAstar = (
@@ -74,12 +71,9 @@ export const App = () => {
 
       // Set UI state
       setBspAstarMessage("generated dungeon in " + duration + "ms");
-      setDoors(dungeon.doors);
-      setRoutes(dungeon.routes);
+      setDungeon(dungeon);
       setMapWidth(width);
       setMapHeight(height);
-      setBSPTree(dungeon.bspTree);
-      setMap(dungeon.map);
     } catch (e) {
       setBspAstarMessage(e.message);
       return;
@@ -127,28 +121,6 @@ export const App = () => {
     setBSPAstarCellularMap(map);
   };
 
-  const addRoutesToMap = (map: CellularMapPoint[][], routes: Point[][]) => {
-    for (let i = 0; i < routes.length; i++) {
-      for (let n = 0; n < routes[i].length; n++) {
-        const { x, y } = routes[i][n];
-        for (
-          let yy = Math.max(0, y - 1);
-          yy <= Math.min(map.length - 1, y + 1);
-          yy++
-        ) {
-          for (
-            let xx = Math.max(0, x - 1);
-            xx <= Math.min(map[y].length - 1, x + 1);
-            xx++
-          ) {
-            map[yy][xx] = CellularMapPoint.LOCKEDROOM;
-          }
-        }
-      }
-    }
-    return map;
-  };
-
   const initializeBSPAstarCellular = (
     height: number,
     width: number,
@@ -164,7 +136,7 @@ export const App = () => {
     const mapWithRoutes = addRoutesToMap(initialCellularMap, dungeon.routes);
     const duration = Date.now() - startTime;
     // Set UI state
-    setCleanUpStart(dungeon.routes[0][0]);
+    setCleanUpStart(dungeon.pathfindingStart);
     setBSPAstarCellularMap(mapWithRoutes);
     setBspAstarCellularMessage("generated dungeon in " + duration + "ms");
     setBSPAstarCellularHeight(height);
@@ -212,10 +184,7 @@ export const App = () => {
             mapWidth={mapWidth}
             mapHeight={mapHeight}
             showLeafBoundaries={showLeafBoundaries}
-            leaves={bspTree?.getLeaves()}
-            routes={routes}
-            doors={doors}
-            map={map}
+            dungeon={dungeon}
             showGrid={showGrid}
             showRoutes={showRoutes}
             showRooms={showRooms}

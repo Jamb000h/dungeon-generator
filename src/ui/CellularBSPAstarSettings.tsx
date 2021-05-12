@@ -12,9 +12,9 @@ interface Props {
 }
 
 export const CellularBSPAstarSettings = (props: Props) => {
-  const [updatedMapWidth, setUpdatedMapWidth] = useState(1000);
+  const [updatedMapWidth, setUpdatedMapWidth] = useState(500);
   const [updatedMapHeight, setUpdatedMapHeight] = useState(500);
-  const [updatedGridSize, setUpdatedGridSize] = useState(40);
+  const [updatedGridSize, setUpdatedGridSize] = useState(35);
   const [updatedRoomRatio, setUpdatedRoomRatio] = useState(0.5);
   const [initialized, setInitialized] = useState(false);
   const [cleaned, setCleaned] = useState(false);
