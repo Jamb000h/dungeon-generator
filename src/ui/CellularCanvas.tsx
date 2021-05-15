@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { CellularMapPoint } from "../other/Cellular";
+import { CellularMapPoint } from "../enums/CellularMapPoint";
 import "./Canvas.css";
 
 interface Props {

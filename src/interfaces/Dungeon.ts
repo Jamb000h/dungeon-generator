@@ -1,8 +1,8 @@
 import { BSPTree } from "../data-structures/BSPTree";
-import { Area } from "../interfaces/Area";
-import { Point } from "../interfaces/Point";
-import { RoomDoors } from "../interfaces/RoomDoors";
-import { MapPoint } from "./MapPoint";
+import { Area } from "./Area";
+import { Point } from "./Point";
+import { RoomDoors } from "./RoomDoors";
+import { MapPoint } from "../enums/MapPoint";
 
 export interface Dungeon {
   routes: Point[][];

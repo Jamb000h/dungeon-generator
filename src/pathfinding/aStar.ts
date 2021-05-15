@@ -53,7 +53,6 @@ export const aStar = (
       return fastestRoute;
     }
 
-    // Get valid directions
     const validNeighbors = getValidNeighbors(current.x, current.y, map);
 
     // Go through all valid directions and if this route is faster than the previous one,
@@ -62,21 +61,16 @@ export const aStar = (
       const neighborY = validNeighbors[i][0];
       const neighborX = validNeighbors[i][1];
 
-      // Parse a key for bookkeeping
       const directionKey = `${neighborY}-${neighborX}`;
-
-      // Get current distance from bookkeeping or assume Infinity
       const directionDistance =
         distances[directionKey] !== undefined
           ? distances[directionKey]
           : Infinity;
 
-      // Calculate new distance
       const newDirectionDistance = current.priority + 1;
 
       const heuristic = manhattan({ y: neighborY, x: neighborX }, finish);
 
-      // If new distance is faster, update bookkeeping
       if (!visited[directionKey] || newDirectionDistance < directionDistance) {
         distances[directionKey] = newDirectionDistance;
         parents[directionKey] = key;
@@ -88,6 +82,12 @@ export const aStar = (
   return [];
 };
 
+/**
+ * Get valid neighbors for a point
+ * @param x point x
+ * @param y point y
+ * @param map map to check in
+ */
 const getValidNeighbors = (x: number, y: number, map: MapPoint[][]) => {
   const validNeighbors = [];
 
@@ -110,16 +110,32 @@ const getValidNeighbors = (x: number, y: number, map: MapPoint[][]) => {
   return validNeighbors;
 };
 
+/**
+ * Checks if a given node is a valid pathfinding node
+ * @param x point x
+ * @param y point y
+ * @param map map to check in
+ */
 const isValidNeighbor = (x: number, y: number, map: MapPoint[][]) => {
   return isInBounds(map, { x, y }) && isOnGrid(map, { x, y });
 };
 
+/**
+ * Checks if a point is on pathfinding grid
+ * @param map map to check in
+ * @param point point to check
+ */
 const isOnGrid = (map: MapPoint[][], point: Point) => {
   return [MapPoint.GRID, MapPoint.ROAD, MapPoint.DOOR].includes(
     map[point.y][point.x]
   );
 };
 
+/**
+ * List the route from a given point to the pathfinding start
+ * @param key node to backtrack from
+ * @param parents list of parents
+ */
 const route = (key: string, parents: { [key: string]: string }): Point[] => {
   const route: Point[] = [];
   let currentKey = key;
@@ -141,6 +157,11 @@ const route = (key: string, parents: { [key: string]: string }): Point[] => {
   return route;
 };
 
+/**
+ * Heuristic function that calculates manhattan distance between points a and b
+ * @param a point a
+ * @param b point b
+ */
 const manhattan = (a: Point, b: Point): number => {
   return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
 };

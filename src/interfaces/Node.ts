@@ -1,5 +1,5 @@
-export interface Node {
-  x: number;
-  y: number;
+import { Point } from "./Point";
+
+export interface PQNode extends Point {
   priority: number;
 }

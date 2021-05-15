@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Dungeon } from "../enums/Dungeon";
+import { Dungeon } from "../interfaces/Dungeon";
 import { MapPoint } from "../enums/MapPoint";
 import "./Canvas.css";
 

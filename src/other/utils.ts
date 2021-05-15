@@ -5,8 +5,8 @@ import { Direction } from "../enums/Direction";
 import { RoomDoors } from "../interfaces/RoomDoors";
 import { getRoutes } from "../pathfinding/aStar";
 import { BSP } from "./BSP";
-import { Dungeon } from "../enums/Dungeon";
-import { CellularMapPoint } from "./Cellular";
+import { Dungeon } from "../interfaces/Dungeon";
+import { CellularMapPoint } from "../enums/CellularMapPoint";
 import { Point } from "../interfaces/Point";
 
 /**
@@ -245,11 +245,9 @@ const generateDoor = (
   let doorX;
   let doorY;
 
-  // Get min and max values for doors
   const { minX, maxX, minY, maxY } = calculateDoorLimits(room, gridSize);
 
   if (direction === Direction.TOP || direction === Direction.BOTTOM) {
-    // Get random x that is bound to grid
     doorX = getRandomBoundToGrid(minX, maxX, gridSize);
 
     // set y to either top or bottom wall
@@ -259,7 +257,6 @@ const generateDoor = (
       doorY = room.y + room.height - 1;
     }
   } else {
-    // Get random y that is bound to grid
     doorY = getRandomBoundToGrid(minY, maxY, gridSize);
 
     // set x to either left or right wall
@@ -338,7 +335,9 @@ export const generateDungeon = (
   }
 
   if (gridSize > width / 4 || gridSize > height / 4) {
-    throw new Error("grid size too large");
+    throw new Error(
+      "grid size too large - cannot be larger than 1/4 of width or height"
+    );
   }
 
   // Run BSP to split area
@@ -381,6 +380,12 @@ export const generateDungeon = (
   };
 };
 
+/**
+ * Finds points that are reachable from the given point.
+ * Uses DFS.
+ * @param map Map to find reachable points in
+ * @param start Point to start DFS from
+ */
 export const findReachablePoints = (
   map: CellularMapPoint[][] | MapPoint[][],
   start: Point
@@ -411,6 +416,11 @@ export const findReachablePoints = (
   return valid;
 };
 
+/**
+ *
+ * @param map Checks if a given point is within map limits
+ * @param point Points to check
+ */
 export const isInBounds = (
   map: MapPoint[][] | CellularMapPoint[][],
   point: Point
@@ -419,6 +429,11 @@ export const isInBounds = (
   return y >= 0 && y < map.length && x >= 0 && x < map[y].length;
 };
 
+/**
+ *
+ * @param map Gets neighboring points of a point
+ * @param point Poiint to get neighbors for
+ */
 export const findNeighbors = (
   map: MapPoint[][] | CellularMapPoint[][],
   point: Point

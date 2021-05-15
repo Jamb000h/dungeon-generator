@@ -1,6 +1,10 @@
+import { CellularMapPoint } from "../enums/CellularMapPoint";
+import { MapPoint } from "../enums/MapPoint";
 import {
-  CellularMapPoint,
+  addRoutesToMap,
+  cleanup,
   generateCellularDungeon,
+  generateCellularDungeonFromBSPAStar,
   getNeighborTypeCounts,
   iterateCellularDungeon,
 } from "../other/Cellular";
@@ -130,5 +134,74 @@ describe("iterateCellularDungeon", () => {
     const dungeon = generateCellularDungeon(20, 20, 0.5);
     const iteratedDungeon = iterateCellularDungeon(dungeon, 5, 5);
     expect(iteratedDungeon).not.toEqual(dungeon);
+  });
+
+  test("does not touch LockedRooms", () => {
+    const dungeon = generateCellularDungeon(3, 3, 0.5);
+    dungeon[1][1] = CellularMapPoint.LOCKEDROOM;
+    const iteratedDungeon = iterateCellularDungeon(dungeon, 1, 1);
+    expect(iteratedDungeon[1][1]).toEqual(CellularMapPoint.LOCKEDROOM);
+  });
+});
+
+describe("addRoutesToMap", () => {
+  test("turns routes to locked rooms", () => {
+    const map = [
+      [CellularMapPoint.ROOM, CellularMapPoint.WALL],
+      [CellularMapPoint.WALL, CellularMapPoint.ROOM],
+    ];
+    const routes = [[{ x: 0, y: 1 }]];
+    const mapWithRoutesAdded = addRoutesToMap(map, routes);
+    expect(mapWithRoutesAdded).toEqual([
+      [CellularMapPoint.ROOM, CellularMapPoint.WALL],
+      [CellularMapPoint.LOCKEDROOM, CellularMapPoint.ROOM],
+    ]);
+  });
+});
+
+describe("cleanup", () => {
+  test("removes unreachable nodes", () => {
+    const map = [
+      [CellularMapPoint.ROOM, CellularMapPoint.ROOM],
+      [CellularMapPoint.WALL, CellularMapPoint.ROOM],
+      [CellularMapPoint.WALL, CellularMapPoint.WALL],
+      [CellularMapPoint.ROOM, CellularMapPoint.WALL],
+    ];
+    const start = { x: 0, y: 0 };
+    const cleanedMap = cleanup(map, start);
+    expect(cleanedMap).toEqual([
+      [CellularMapPoint.ROOM, CellularMapPoint.ROOM],
+      [CellularMapPoint.WALL, CellularMapPoint.ROOM],
+      [CellularMapPoint.WALL, CellularMapPoint.WALL],
+      [CellularMapPoint.WALL, CellularMapPoint.WALL],
+    ]);
+  });
+});
+
+describe("generateCellularDungeonFromBSPAStar", () => {
+  test("converts a bspAstar dungeon to a cellular dungeon 1", () => {
+    const map = [
+      [MapPoint.ROAD, MapPoint.DOOR],
+      [MapPoint.GRID, MapPoint.ROOM],
+    ];
+    const convertedMap = generateCellularDungeonFromBSPAStar(map, 1);
+
+    expect(convertedMap).toEqual([
+      [CellularMapPoint.LOCKEDROOM, CellularMapPoint.LOCKEDROOM],
+      [CellularMapPoint.ROOM, CellularMapPoint.LOCKEDROOM],
+    ]);
+  });
+
+  test("converts a bspAstar dungeon to a cellular dungeon 2", () => {
+    const map = [
+      [MapPoint.ROAD, MapPoint.DOOR],
+      [MapPoint.GRID, MapPoint.ROOM],
+    ];
+    const convertedMap = generateCellularDungeonFromBSPAStar(map, 0);
+
+    expect(convertedMap).toEqual([
+      [CellularMapPoint.LOCKEDROOM, CellularMapPoint.LOCKEDROOM],
+      [CellularMapPoint.WALL, CellularMapPoint.LOCKEDROOM],
+    ]);
   });
 });

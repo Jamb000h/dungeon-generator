@@ -1,11 +1,7 @@
-interface Node {
-  x: number;
-  y: number;
-  priority: number;
-}
+import { PQNode } from "../interfaces/Node";
 
 export class PriorityQueue {
-  private values: Node[];
+  private values: PQNode[];
 
   /**
    * Creates a new minimum priority queue. Smallest priority on top.
@@ -21,7 +17,6 @@ export class PriorityQueue {
    * @param priority priority
    */
   push(x: number, y: number, priority: number) {
-    // Add to queue
     this.values.push({ x, y, priority });
 
     // Move up in the queue until correctly positioned
@@ -32,21 +27,20 @@ export class PriorityQueue {
    * Returns the smallest node in the queue
    * @return {object} the smallest node in the queue
    */
-  pop(): Node {
-    // Get smallest node
-    const smallest = { ...this.values[0] };
-    // Get largest index
-    const bottomIndex = this.values.length - 1;
+  pop(): PQNode {
+    const smallestNode = { ...this.values[0] };
+    const largestIndex = this.values.length - 1;
 
-    // Switch smallest node and largest node
-    this.swap(0, bottomIndex);
+    // Swap smallest node (index 0) and largest node
+    this.swap(0, largestIndex);
+
     // Remove smallest node
     this.values.pop();
 
     // Move largest node to correct position
     this.moveDown();
 
-    return smallest;
+    return smallestNode;
   }
 
   /**
@@ -77,8 +71,8 @@ export class PriorityQueue {
     // Start at the first value
     let currentIndex = 0;
     let smallestIndex = 0;
+
     while (true) {
-      // Get indices for potential children
       const leftChildIndex = 2 * currentIndex + 1;
       const rightChildIndex = 2 * currentIndex + 2;
 
@@ -87,8 +81,6 @@ export class PriorityQueue {
         this.values[leftChildIndex].priority <
           this.values[smallestIndex].priority
       ) {
-        // Assuming we found a left child and the left child has a smaller priority than our current
-        // smallest priority, we set that the current smallest is the left child
         smallestIndex = leftChildIndex;
       }
 
@@ -97,8 +89,6 @@ export class PriorityQueue {
         this.values[rightChildIndex].priority <
           this.values[smallestIndex].priority
       ) {
-        // Assuming we found a right child and the right child has a smaller priority than our current
-        // smallest priority, we set that the current smallest is the right child
         smallestIndex = rightChildIndex;
       }
 
@@ -107,7 +97,6 @@ export class PriorityQueue {
         this.swap(currentIndex, smallestIndex);
         currentIndex = smallestIndex;
       } else {
-        // Otherwise the current value is in correct position
         break;
       }
     }
@@ -126,13 +115,17 @@ export class PriorityQueue {
 
   /**
    * Return information whether the queue is empty
-   * @return true if empty, false otherwise
+   * @return {boolean} true if empty, false otherwise
    */
-  isEmpty() {
+  isEmpty(): boolean {
     return this.values.length === 0;
   }
 
-  getValues() {
+  /**
+   * Get all values of the queue
+   * @return {PQNode[]} Array of PQNodes
+   */
+  getValues(): PQNode[] {
     return this.values;
   }
 }

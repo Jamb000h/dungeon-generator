@@ -26,9 +26,7 @@ export const BSP = (
   height: number,
   options: Options
 ): BSPTree => {
-  // Handle default options and given options
   const opts = { ...defaultOptions, ...options };
-
   const tree = new BSPTree(width, height);
 
   // Generate the BSP tree by splitting the root node until it cannot be split anymore
@@ -63,20 +61,20 @@ const split = (node: BSPNode, options: Options & DefaultOptions) => {
   if (splitDirection === SplitDirection.VERTICAL) {
     const minimumSplit = gridSize * 2;
     const maxSplit = width - 1;
-    const split = getRandomBetween(minimumSplit, maxSplit);
+    const splitPoint = getRandomBetween(minimumSplit, maxSplit);
 
     node.addChildren([
-      new BSPNode(x, y, split, height),
-      new BSPNode(x + split, y, width - split, height),
+      new BSPNode(x, y, splitPoint, height),
+      new BSPNode(x + splitPoint, y, width - splitPoint, height),
     ]);
   } else {
     const minimumSplit = gridSize * 2;
     const maxSplit = height;
-    const split = getRandomBetween(minimumSplit, maxSplit);
+    const splitPoint = getRandomBetween(minimumSplit, maxSplit);
 
     node.addChildren([
-      new BSPNode(x, y, width, split),
-      new BSPNode(x, y + split, width, height - split),
+      new BSPNode(x, y, width, splitPoint),
+      new BSPNode(x, y + splitPoint, width, height - splitPoint),
     ]);
   }
 

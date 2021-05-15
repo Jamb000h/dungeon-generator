@@ -9,16 +9,15 @@ import { CellularSettings } from "./CellularSettings";
 import { CellularCanvas } from "./CellularCanvas";
 import {
   addRoutesToMap,
-  CellularMapPoint,
   cleanup,
   generateCellularDungeon,
   generateCellularDungeonFromBSPAStar,
   iterateCellularDungeon,
-  iterateCellularDungeonFromBSPAStar,
 } from "../other/Cellular";
 import { CellularBSPAstarSettings } from "./CellularBSPAstarSettings";
 import { CellularBSPAstarCanvas } from "./CellularBSPAstarCanvas";
-import { Dungeon } from "../enums/Dungeon";
+import { Dungeon } from "../interfaces/Dungeon";
+import { CellularMapPoint } from "../enums/CellularMapPoint";
 
 enum AppToShow {
   CELLULAR = "CELLULAR",
@@ -115,7 +114,7 @@ export const App = () => {
 
   const iterateBSPAstarCellular = () => {
     const startTime = Date.now();
-    const map = iterateCellularDungeonFromBSPAStar(bspAstarCellularMap, 5, 4);
+    const map = iterateCellularDungeon(bspAstarCellularMap, 5, 4);
     const duration = Date.now() - startTime;
     setBspAstarCellularMessage("iterated in " + duration + "ms");
     setBSPAstarCellularMap(map);
