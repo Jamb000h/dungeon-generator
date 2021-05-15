@@ -24,12 +24,10 @@ export const aStar = (
   finish: Point,
   map: MapPoint[][]
 ): Point[] => {
-  // Initialize bookkeeping variables
   const visited: { [key: string]: boolean } = {};
   const distances: { [key: string]: number } = {};
   const parents: { [key: string]: string } = {};
 
-  // Instantiate a new Priority Queue
   const queue = new PriorityQueue();
 
   // Add start node to bookkeeping and Priority Queue
