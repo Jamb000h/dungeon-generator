@@ -25,6 +25,8 @@ export const BSPAstarSettings = (props: Props) => {
         width
         <input
           id="width"
+          type="number"
+          step="1"
           value={updatedMapWidth}
           onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) ?? 0)}
         />
@@ -33,6 +35,8 @@ export const BSPAstarSettings = (props: Props) => {
         height
         <input
           id="height"
+          type="number"
+          step="1"
           value={updatedMapHeight}
           onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) ?? 0)}
         />
@@ -41,6 +45,8 @@ export const BSPAstarSettings = (props: Props) => {
         gridSize
         <input
           id="gridSize"
+          type="number"
+          step="1"
           value={updatedGridSize}
           onChange={(e) => setUpdatedGridSize(parseInt(e.target.value) ?? 0)}
         />

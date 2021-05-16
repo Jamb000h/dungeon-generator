@@ -20,7 +20,11 @@ The project tries to produce an efficient dungeon generation algorithm that gene
 
 [Specification](docs/spec.md)
 
+[Implementation](docs/implementation.md)
+
 [Testing](docs/test.md)
+
+[Manual](docs/manual.md)
 
 ### Weekly reports
 

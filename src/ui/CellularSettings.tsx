@@ -35,6 +35,8 @@ export const CellularSettings = (props: Props) => {
         width
         <input
           id="width"
+          type="number"
+          step="1"
           value={updatedMapWidth}
           onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) ?? 0)}
         />
@@ -43,6 +45,8 @@ export const CellularSettings = (props: Props) => {
         height
         <input
           id="height"
+          type="number"
+          step="1"
           value={updatedMapHeight}
           onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) ?? 0)}
         />
@@ -51,6 +55,8 @@ export const CellularSettings = (props: Props) => {
         initial iterations to run
         <input
           id="initialIterations"
+          type="number"
+          step="1"
           value={initialIterations}
           onChange={(e) => setInitialIterations(parseInt(e.target.value) ?? 5)}
         />
@@ -59,6 +65,10 @@ export const CellularSettings = (props: Props) => {
         initial room ratio
         <input
           id="initialRoomRatio"
+          type="number"
+          min="0"
+          max="1"
+          step="0.05"
           value={initialRoomRatio}
           onChange={(e) =>
             setInitialRoomRatio(parseFloat(e.target.value) ?? 0.5)
@@ -69,6 +79,10 @@ export const CellularSettings = (props: Props) => {
         turn to room threshold
         <input
           id="turnToRoomThreshold"
+          type="number"
+          step="1"
+          min="0"
+          max="8"
           value={turnToRoomThreshold}
           onChange={(e) =>
             setTurnToRoomThreshold(parseInt(e.target.value) ?? 5)
@@ -79,6 +93,10 @@ export const CellularSettings = (props: Props) => {
         turn to wall threshold
         <input
           id="turnToWallThreshold"
+          type="number"
+          step="1"
+          min="0"
+          max="8"
           value={turnToWallThreshold}
           onChange={(e) =>
             setTurnToWallThreshold(parseInt(e.target.value) ?? 5)

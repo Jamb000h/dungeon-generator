@@ -24,6 +24,8 @@ export const CellularBSPAstarSettings = (props: Props) => {
       <label htmlFor="width">
         width
         <input
+          type="number"
+          step="1"
           id="width"
           value={updatedMapWidth}
           onChange={(e) => setUpdatedMapWidth(parseInt(e.target.value) ?? 0)}
@@ -32,6 +34,8 @@ export const CellularBSPAstarSettings = (props: Props) => {
       <label htmlFor="height">
         height
         <input
+          type="number"
+          step="1"
           id="height"
           value={updatedMapHeight}
           onChange={(e) => setUpdatedMapHeight(parseInt(e.target.value) ?? 0)}
@@ -40,6 +44,8 @@ export const CellularBSPAstarSettings = (props: Props) => {
       <label htmlFor="gridSize">
         gridSize
         <input
+          type="number"
+          step="1"
           id="gridSize"
           value={updatedGridSize}
           onChange={(e) => setUpdatedGridSize(parseInt(e.target.value) ?? 0)}
@@ -50,6 +56,10 @@ export const CellularBSPAstarSettings = (props: Props) => {
         <input
           id="initialRoomRatio"
           value={updatedRoomRatio}
+          type="number"
+          min="0"
+          max="1"
+          step="0.05"
           onChange={(e) =>
             setUpdatedRoomRatio(parseFloat(e.target.value) ?? 0.5)
           }
