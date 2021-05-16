@@ -8,7 +8,7 @@ The project is about dungeon generation, with main focus on the following:
 - routes between rooms
 - sufficient performance for average full screen resolution (1920x1080)
 
-## High-level process
+## High-level process for main work which is BSP + A-star
 
 The dungeon generation is built as follows (on a high level, complexity analysis below)
 
@@ -20,7 +20,7 @@ The dungeon generation is built as follows (on a high level, complexity analysis
 6. Route generation
 7. Drawing the dungeon
 
-## Complexity analysis
+## Complexity analysis for BSP + A-star
 
 Complexity analysis is provided as per the steps in the above high-level process.
 
@@ -242,3 +242,23 @@ function moveDown() {
 ```
 
 It can be seen that moveDown doubles the index when checking for children. This means that it traverses the tree in `O(log n)`.
+
+## Complexity analysis for cellular generation
+
+Cellular generation means going through a `n*m` array for each iteration and running `O(1)` operation for deciding what to do with each item. So the time complexity for each iteration is `O(nm)`.
+
+## Sources
+
+[1] Generic description of dungeon generation using BSP. Stack Overflow. URL: https://gamedev.stackexchange.com/a/82066
+
+[2] Binary Space Partitioning. Wikipedia. URL: https://en.wikipedia.org/wiki/Binary_space_partitioning
+
+[3] A* Search Algorithm. Wikipedia. URL: https://en.wikipedia.org/wiki/A*\_search_algorithm
+
+[4] EXACT SIZE OF BINARY SPACE PARTITIONINGS ANDIMPROVED RECTANGLE TILING ALGORITHMS. BERMAN, DASGUPTA, MUTHUKRISHNAN. URL: https://www.cs.uic.edu/~dasgupta/resume/publ/papers/bsp.pdf
+
+[5] Heaps and Priority Queues. Hackerearth. https://www.hackerearth.com/practice/notes/heaps-and-priority-queues/
+
+[6] Binary Heaps and Priority Queues via JavaScript. DigitalOcean. https://www.digitalocean.com/community/tutorials/js-binary-heaps
+
+[7] Constructive Generation Methods for Dungeons. Marco Niemann. https://www.wi.uni-muenster.de/sites/wi/files/users/mpreu_02/games-material/ba-vm-ss2015/marco_niemann_-_constructive_generation_methods_for_dungeons_-_thesis.pdf
