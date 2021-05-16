@@ -2,6 +2,10 @@
 
 This project contains unit tests for data structures, algorithms and utility functions. User interface does not have any tests.
 
+## Summary
+
+Generating a very usable map of a sufficient size (1000 x 1000, gridSize 50 which results in around 15-20 rooms) with the plaing BSP + Astar takes on average around 250ms, which is good enough for most purposes, and definitely so for video games. Adding cellular generation to the mix takes the processing time ultimately to several seconds, which reduces the number of applications for the generation, which is sad as the results are a bit more organic, although maybe not better. The organic feeling could be generated in some other manner, but that can be a topic for a different project.
+
 ## Methodology
 
 ### Unit tests

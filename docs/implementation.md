@@ -8,6 +8,10 @@ The project is about dungeon generation, with main focus on the following:
 - routes between rooms
 - sufficient performance for average full screen resolution (1920x1080)
 
+## Brief summary
+
+The implementation was quite close to what was written in the specification document, although the specification document did not specify a secondary algorithm, which ended up being cellular dungeon generation. I think based on both automated and manual performance testing I reached my goals for the primary BSP + Astar implementation, but the cellular generation is not as useful as I hoped. For time complexity, I think I reached sufficient levels based on empirical testing.
+
 ## High-level process for main work which is BSP + A-star
 
 The dungeon generation is built as follows (on a high level, complexity analysis below)
